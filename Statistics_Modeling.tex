@@ -1,0 +1,633 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{ulem}
+\usepackage{xeCJKfntef}
+\usepackage{hyperref}
+\usepackage{biblatex}
+\geometry{scale=0.85,a4paper}
+\everymath{\displaystyle}
+\xeCJKsetup{underline = {skip = false}}
+
+\title{Maxwell General Learning System Academic\\ Statistics Modeling\\ 麦克斯韦通用高等习得系统\\ 统计建模}
+\author{Leo\_Maxwell }
+\date{March 2023}
+
+\begin{document}
+
+\maketitle
+\vfill
+\begin{center}
+\textbf{Good Explanation\textgreater Symbolic Proof.}
+\end{center}
+\vfill
+
+\newpage
+\tableofcontents
+\newpage
+
+\section*{序言 Introduction}
+本文主要讲了如何通过运用统计方法建立数学模型并进行分析。
+
+您至少需要掌握《综合统计学》中大部分的初等统计学知识才能使用这份文档。
+
+\section{常用的假设检验模型}
+\subsection{检验样本中的占比和总体中的占比是否有显著差异的模型}
+已知澳大利亚所有公民中患哮喘的比例是7\%，现抽取澳大利亚某一特定群体中的200人进行调查，发现24人患有哮喘，请问能不能认为这一特定群体的患病率与澳大利亚总体的患病率有显著差异？该样本患病率的置信区间是多少？（置信水平为95\%）\\
+\indent 容易计算出这一特定人群中的患病率是12\%，我们把这一特定群体的患病率不显著偏离7\% 设定为原假设，把这一特定群体的患病率显著偏离7\% 设定为备择假设。现在按照之前给定的步骤计算p-value并将其和5\%进行比较，看看这一事件发生的概率是不是不小于5\%。\\
+\indent 此时使用之前提到的公式$Z=\frac{\Bar{X}-\mu}{SE}$计算，但是此时我们是使用$\hat{p}-p_0$作为分子，$\hat{p}$代表的是被检验的概率大小（12\%），$p_0$则代表的是已知的、要进行对比的概率（7\%）。这时的标准误差$SE=\sqrt{\frac{p_0\left(1-p_0\right)}{n}}$，其中$n$是样本的大小，在这道题目中是200。知道了以上参数后就可以计算出检验统计量$Z$为2.77137。利用这个检验统计量符合正态分布的特性算出$pvalue=P(|Z|\geq 2.77137)=0.0056<0.05$，即原假设为真的概率是0.0056，小于5\%，所以我们认为原假设在现实中不可能发生，从而拒绝原假设而接受备择假设，认为这一特定群体的患病率显著偏离7\%。\\
+\indent 此时按照通用的置信区间计算公式：（\textbf{注意！计算置信区间时所用的SE不同！$SE=\sqrt{\frac{\hat{p}\left(1-\hat{p}\right)}{n}}$}）
+\[
+\left(\text{Estimate}-z_{\frac{\alpha}{2}}\times SE,\text{Estimate}+z_{\frac{\alpha}{2}}\times SE\right)
+\]
+\indent 这里的估计值就是$\hat{p}$，带入计算即可。
+\subsection{推测总体方差的模型}
+已知某容量为$n$的随机样本的标准差是$S^2$，满足自由度为$n-1$的卡方分布。选定显著性水平为$\alpha$，取得两个卡方分布的分位数$c_1$和$c_2$使得$P(c_1<S<c_2)=1-\alpha$，则它的一个置信水平为$100(1-\alpha)\%$的置信区间为
+\[
+	\left(\frac{(n-1)S^2}{c_2},\frac{(n-1)S^2}{c_1}\right)
+\]
+
+但是这$c_1$和$c_2$的取法却有讲究。有无限多个$c_1$和$c_2$满足上述公式，要怎样选择才最好？有三种选择方式：
+
+\begin{enumerate}
+  \item 选择对称的。即，选择$P(S<c_1)=\frac{\alpha}{2},\ P(S>c_2)=\frac{\alpha}{2}$，这是典型的双边检验。
+  \item 选择单边左的。即，选择$c_1=0,\ P(S>c_2)=\alpha$，这是单边检验。
+  \item 选择单边右的。即，选择$P(S<c_1)=\alpha,\ c_2=+\infty$，这也是单边检验。
+\end{enumerate}
+
+\subsection{检验平均值是否和给定值有显著差异的模型}
+\subsubsection{单样本T检验}
+猫血液中红细胞的含量服从平均值为6.5个单位的正态分布。现有20只猫组成的样本空间，对该样本中每只个体红细胞的含量进行测量，得到的平均值是6.577个单位，标准差是0.8349983。现在想要知道，该样本的均值和总体的均值是否有显著差异？样本均值的置信区间是多少？（置信水平为95\%）\\
+\indent 此时的检验统计量公式还是$Z=\frac{\Bar{X}-\mu}{SE}$，标准误差$SE$是$\frac{s}{\sqrt{n}}$，其中$s=\sqrt{\frac{1}{n-1}}\times \sum_{i=1}^n\left(X_i-\Bar{X}\right)$，其中$n-1$就是自由度（df）。\\
+\indent 原假设是该样本的均值和总体均值无显著差异，备择假设是该样本的均值和总体均值有显著差异。检验统计量符合自由度为$n-1$的T分布，计算出该检验统计量对应的p-value并和5\%进行比较，即可决定是否拒绝原假设。\\
+\indent 至于置信区间，按照通用的公式
+\[
+\left(\text{Estimate}-z_{\frac{\alpha}{2}}\times SE,\text{Estimate}+z_{\frac{\alpha}{2}}\times SE\right)
+\]
+直接带入计算即可。
+\subsubsection{标准差不同的独立双样本T检验(非池化(not pooled)双样本T检验)}
+\noindent \textbf{注意：标准差不同指的是两个样本的标准差相差超过100\%，即大的标准差大于小的标准差的两倍。}\\
+\indent 为了检验HRT激素替代疗法在治疗妇女的HDL胆固醇上的疗效，现有60名75岁以上的妇女作为实验对象被随机地分为两组，一组接受HRT激素替代疗法，另一组仅服用安慰剂。经过9个月的治疗，得到以下实验结果：（其中一名实验对象自然死亡）
+\begin{center}
+    \begin{tabular}{|c|c|c|}
+\hline\hline
+            &HRT疗法组&安慰剂组\\\hline
+     样本均值&8.1&2.4  \\\hline
+     样本标准差&10.5&4.3  \\\hline
+     样本容量&30&29\\
+     \hline\hline
+\end{tabular}\\
+\end{center}
+请问这两组对于HDL胆固醇的控制水平有没有显著差异？\\
+\indent 此时认为原假设是$H_0: \mu_1=\mu_2$，即两组控制水平没有显著差异，备择假设是$H_a: \mu_1\neq\mu_2$。需要检验的参数是$\Bar{x}_1-\Bar{x}_2$，并把其与零做比较（此时原假设也可以等价地叙述为$H_0: \mu_1-\mu_2=0$），所以此时的检验统计量是$Z=\frac{\left(\Bar{x}_1-\Bar{x}_2\right)-0}{SE}$。标准误差参见表格可以知道是$SE=\sqrt{\frac{s_1^2}{n_1}+\frac{s_2^2}{n_2}}$，其中$s$代表对应的标准差，$n$代表对应的样本空间。其遵循的是自由度为$\mathrm{min}\{n_1,n_2\}-1$的T分布，即更少的样本数量减去一的T分布。计算可得到p-value，和指定的显著性水平比较即可选择是否拒绝原假设。
+
+选择自由度的时候，还有另外一种计算方式，可以令自由度等于
+\[
+	\frac{\left(\frac{s_1^2}{n_1}+\frac{s_2^2}{n_2}\right)^2}{\frac{s_1^4}{n_1^2(n_1-1)}+\frac{s_2^4}{n_2^2(n_2-1)}}
+\]
+
+在使用计算机进行假设检验时，可以用这个公式计算自由度。
+\subsubsection{标准差相同的独立双样本T检验（池化(pooled)双样本T检验）}
+\noindent \textbf{注意：标准差相同指的是两个样本的标准差相差不超过100\%，即大的标准差不大于小的标准差的两倍。}\\
+\indent 现有21名志愿者被随机分为两个小组，其中一组接受钙补充剂，另外一组接受安慰剂，持续12周后分别测量他们的收缩压降低值，观察他们的收缩压降低有无显著差异，结果如下表所示。
+\begin{center}
+    \begin{tabular}{|c|c|c|c|}
+    \hline\hline
+        接受类型&样本容量&平均降低收缩压&标准差  \\\hline
+         钙补充剂&10&5&8.743\\\hline
+         安慰剂&11&-0.273&5.901\\\hline\hline
+    \end{tabular}
+\end{center}
+请问这两组之间的收缩压降低值有没有统计学意义上的显著差异？并计算置信区间。（置信水平95\%）\\
+与上面的问题相似，这也是计算两组之间的某个值有没有显著区别，只是这一回两组的方差“认为相同”，标准误差变成了$SE=s_P\sqrt{\frac{1}{n_1}+\frac{1}{n_2}}$，其中，$s_P=\sqrt{\frac{\left(n_1-1\right)s_1^2+\left(n_2-1\right)s_2^2}{n_1+n_2-2}}$，并且$s_P\sim \chi_{n_1+n_2-2}^2$，自由度变为$n_1+n_2-2$，其余步骤与上一个模型相同。
+\subsubsection{双样本T检验的非参版本——威尔科克逊-曼-惠特尼检验}
+给出用A和B两种不同疗法治疗的腺癌病人的存活时长（单位：月），希望知道两种疗法在存活时长上有无统计学意义上的显著差异。
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline\hline
+     Type A&7.02&5.60&6.59&20.14  \\\hline
+     Type B&16.81&21.67&13.4&29.11\\\hline\hline 
+\end{tabular}
+\end{center}
+由于存活时间不符合正态分布，所以在这里我们使用非参估计。这和双样本T检验事实上是等价的。\\
+\indent 下面先介绍威尔科克逊检验。将所有测得的值从小到大排列：
+\begin{center}
+    \begin{tabular}{|c|c|c|}
+    \hline\hline
+         组别&值&排序值  \\\hline
+         A&5.60&1\\ \hline
+         A&6.59&2\\ \hline
+         A&7.02&3\\ \hline
+         B&13.40&4\\ \hline
+         B&16.81&5\\ \hline
+         A&20.14&6\\ \hline
+         B&21.67&7\\ \hline
+         B&29.11&8\\ \hline\hline
+    \end{tabular}
+\end{center}
+然后我们把A组或者B组的所有排序值加起来，得到$U$。零假设是这两组数据没有显著区别（也就是说无论是哪一组的数据，每个数据比另外一组数据大或者小的概率都是二分之一），在这个假设下，我们可以计算出得到这个$U$值或者更极端的值的概率是多大（p-value），然后把这个概率和显著性水平进行比较。这和其他的模型一样，如果p-value比显著性水平更小，我们就说拒绝原假设；除此之外，我们保留原假设。
+\subsubsection{成对数据的检验}
+为了检验一种新型汽油是否对降低汽车耗油量有所帮助，某公司选择了9辆使用相同汽油类型的不同汽车，对每一辆汽车先后使用旧汽油和新型汽油并记录它们的每百公里耗油量，数据如下。
+\begin{center}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    \hline\hline
+         旧汽油每百公里耗油量&20.07&23.22&21.10&21.23&21.58&17.05&26.34&17.87&22.29  \\\hline
+         新型汽油每百公里耗油量&15.07&14.73&16.85&15.21&19.91&19.86&14.88&18.17&13.55 \\\hline
+         旧耗油量减新耗油量&5.63&8.49&4.25&6.02&1.67&-2.81&11.46&-0.30&8.74 \\\hline\hline
+    \end{tabular}
+\end{center}
+所以新型汽油在统计学意义上有没有降低汽车的耗油量？（置信水平95\%）\\
+\indent 其实我们只需要算出它们耗油量之差的均值和标准误差，然后把均值和零进行比较即可，遵循的分布是自由度为$n-1$的T分布。概括地说，这和单样本T检验没有区别。
+\subsubsection{成对数据检验的非参版本}
+还是以上述数据作为例子。我们计算出新耗油量比旧耗油量少的数量，令零假设为新旧汽油在耗油量上没有区别（即二者耗油量比对方低的概率为二分之一），这样就得到一个二项分布$B(n,0.5)$。计算出在这个假设下新旧耗油量有别的概率大小并与显著性水平进行对比，然后选择是否拒绝原假设。
+\subsubsection{两个不同占比的检验}
+根据以下数据，分析美国男女大学生酗酒的比例有没有统计学上的显著差异？
+\begin{center}
+    \begin{tabular}{|c|c|c|c|}
+    \hline\hline
+         性别组&样本容量&酗酒数量&酗酒比例$\hat{p}$  \\ \hline
+         男&5348&1392&0.26\\ \hline
+         女&8471&1748&0.206\\ \hline
+         总数&13819&3140&0.227\\ \hline \hline
+    \end{tabular}
+\end{center}
+在这里我们说，如果男女大学生酗酒比例没有差别的话，那就是$H_0: \hat{p}_1-\hat{p}_2=0$，备择假设则是比例有差别，即二者相减不为零。在这里我们想要检验的参数就是$\hat{p}_1-\hat{p}_2$，并且将它与零进行比较。此时的标准误差$SE=\sqrt{\hat{p}\left(1-\hat{p}\right)\left(\frac{1}{n_1}+\frac{1}{n_2}\right)}$，再算出检验统计量即可。检验统计量遵循的分布是标准正态分布。
+\subsection{假设检验和置信区间 总结表格}
+\begin{center}
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline\hline
+        模型种类 & 参数 & 估计值 & 标准误差 & 对应分布  \\ \hline
+        估计总体均值（总体标准差为$\sigma$）& $\mu$ & $\Bar{X}$ & $\frac{\sigma}{\sqrt{n}}$ & $N(0,1)$\\ \hline
+        估计总体均值（样本标准差为$s$）& $\mu$ & $\Bar{X}$ & $\frac{s}{\sqrt{n}}$ & $t(n-1)$ \\ \hline
+        双样本T检验（标准差不相等） & $\mu_1-\mu_2$ & $\Bar{X}_1-\Bar{X}_2$ & $\sqrt{\frac{s_1^2}{n_1}+\frac{s_2^2}{n_2}}$ & $t(min\{n_1,n_2\}-1)$\\ \hline
+        双样本T检验（标准差相等） & $\mu_1-\mu_2$ & $\Bar{X}_1-\Bar{X}_2$ & $\sqrt{\frac{\left(n_1-1\right)s_1^2+\left(n_2-1\right)s_2^2}{n_1+n_2-2}}\sqrt{\frac{1}{n_1}+\frac{1}{n_2}}$ & $t(n_1+n_2-2)$\\ \hline
+        成对数据 & $\mu_D$ & $\Bar{d}$ & $\frac{s_D}{\sqrt{n}}$ & $t(n-1)$ \\ \hline
+        单占比置信区间 & $p$ & $\hat{p}=X/n$ & $\sqrt{\frac{\hat{p}\left(1-\hat{p}\right)}{n}}$ & $N(0,1)$\\ \hline
+        单占比差异检验 & $p$ & $\hat{p}=X/n$ & $\sqrt{\frac{p_0\left(1-p_0\right)}{n}}$ & $N(0,1)$\\ \hline
+        双占比置信区间 & $p_1-p_2$ & $\frac{X_1}{n_1}-\frac{X_2}{n_2}$ & $\sqrt{\frac{\hat{p}_1\left(1-\hat{p}_1\right)}{n_1}+\frac{\hat{p}_2\left(1-\hat{p}_2\right)}{n_2}}$ & $N(0,1)$\\ \hline
+        双占比差异检验 & $p_1-p_2$ & $\frac{X_1}{n_1}-\frac{X_2}{n_2}$ & $\sqrt{\hat{p}\left(1-\hat{p}\right)\left(\frac{1}{n_1}+\frac{1}{n_2}\right)}$ & $N(0,1)$\\
+        \hline\hline
+    \end{tabular}\\
+\end{center}
+\section{线性模型(Linear Model, LM)}
+\subsection{基本概念}
+有两个变量，这两个变量之间\textbf{存在联系，但不是函数关系}，但是我们希望用一个代数意义上的函数来描述这两个变量之间的相关性（即拟合）。例如，一般来说体重越重的人身高也越高，但是究竟大概是什么样的关系呢？我们希望用一个函数来描述这种关系。而一元线性回归就是指对于两个变量之间线性的关系进行拟合（其中一个变量对另外一个变量造成影响）。
+
+现在有许多组数据，$(x_1,y_1),\ (x_2,y_2)\ ,\dots,\ (x_n,y_n)$，在简单的一元线性回归中，我们希望找到一个这样的函数关系：
+\[
+Y_i=\beta_0+\beta_1X_i+\varepsilon_i
+\]
+
+其中，$Y_i$是观测数据中真正的值，$\beta_0$是截距，$\beta_1$是斜率，最为重要的是$\varepsilon_i$，它是残差，也是这个公式中的“随机组成部分”，即拟合值与真实值之间的差距。如果把残差去掉，剩下的部分就是一个简单的一次函数。而且我们希望，在这样的模型下，对于残差而言，有$\varepsilon_i\sim N(0,\sigma^2)$，并且相互独立。这样的模型叫做简单线性回归模型(Simple Linear Regression Model, SLR Model)。在后面我们会知道无论是什么关系都可以转换成线性关系，从而构建线性模型。
+\subsection{最小二乘法(Least Square Estimation, LSE)}
+\label{LSE definition}
+使得下列二元函数最小的$\beta_0$和$\beta_1$，就是用最小二乘法得出的理想的$\beta_0$和$\beta_1$，我们记为$\hat\beta_0$和$\hat\beta_1$。
+\[
+Q(\beta_0,\beta_1)=\sum_{i=1}^n(y_i-(\beta_0+\beta_1x_i))^2
+\]
+
+所以其得名最小二乘法。因为若$u_1,u_2,u_3,\dots,u_n$是一列实数，则函数$q(\gamma)=\sum_{i=1}^n(u_i-\gamma)^2$\textbf{仅在}$\gamma=\bar u$时取得最小值（证明请见附录\ref{proof13}），所以我们能通过以下方式计算得到$\hat\beta_0$和$\hat\beta_1$的值，证明请见附录\ref{proof14}。
+\subsubsection{系数计算和性质}
+对于$\Hat{\beta}_1$和$\Hat{\beta}_0$，我们有
+\[
+	\Hat{\beta}_1=\frac{S_{xy}}{S_{xx}}
+\]
+\[
+	\Hat{\beta}_0=\Bar{y}-\hat\beta_1\Bar{x}
+\]
+
+其中，$S_{xy}$被称作cross product sum of squares，$S_{xx}$被称作sum of squares due to $x$，计算方式如下：
+\[
+	S_{xy}=\sum_{i=1}^n(x_i-\Bar{x})(y_i-\Bar{y})
+\]
+\[
+	S_{xx}=\sum_{i=1}^n(x_i-\Bar{x})^2
+\]
+
+现在我们回到概率统计的框架中来。因为线性回归是对许多组成对数据$(x_i,y_i)$进行操作，而这些成对数据中的$y_i$一般都是在相同$x_i$的条件下多次重复实验得到的，或者是从一个未知分布中随机抽取得到的值（例如从一群身高相同的人中抽取一个人的体重），所以线性回归的对象一般都是一列互相独立的随机变量$Y_1,Y_2,\dots,Y_n$，我们假设它们满足$\mathrm E[Y_i]=\beta_0+\beta_1x_i$和$\mathrm{Var}(Y_i)=\sigma^2$，其中，$x_i$就是上述许多组成对数据中的$x_i$。于是，$\hat\beta_0$和$\hat\beta_1$就从两个数字变成两个随机变量。作为随机变量，它们必然是拥有随机变量的属性的，在这里给出：（证明请见附录\ref{proof17}）
+\begin{center}
+    \begin{tabular}{|c|c|c|}
+    \hline\hline
+         &期望&方差  \\\hline
+         $\hat\beta_0$& $\beta_0$ & $\sigma^2\left(\frac{1}{n}+\frac{\Bar{x}^2}{S_{xx}}\right)$\\\hline
+         $\hat\beta_1$& $\beta_1$ & $\frac{\sigma^2}{S_{xx}}$\\ \hline\hline
+    \end{tabular}
+\end{center}
+
+特别地，$\mathrm{Cov}(\hat\beta_0,\hat\beta_1)=-\frac{\bar x\sigma^2}{S_{xx}}$，证明请见\ref{proof18}。
+
+如果我们的数据能够满足$Y_i\sim N(\beta_0+\beta_1x_i,\sigma^2)$，且每个$Y_i$之间相互独立，那么还有性质：（证明请见附录\ref{proof19}）
+\begin{align*}
+	\hat\beta_0&\sim N\left(\beta_0,\sigma^2\left(\frac{1}{n}+\frac{\bar x}{S_{xx}}\right)\right)\\
+	\hat\beta_1&\sim N\left(\beta_1,\frac{\sigma^2}{S_{xx}}\right)\\
+	\frac{(n-2)S_e^2}{\sigma^2}&\sim\chi_{n-2}^2
+\end{align*}
+\subsubsection{残差的性质}
+在定义中我们提到，对我们的线性回归模型而言，残差符合正态分布$N(0,\sigma^2)$。所以在这里残差也是随机变量，只要是随机变量，我们就研究它的性质。该分布中只有一个参数是我们未知的，所以我们接下来推测这个参数$\sigma^2$。
+
+我们仍然用样本的方差$S_e^2$来估计总体方差$\sigma^2$，如同我们之前做过的那样：（说明请见附录\ref{proof15}）
+\[S_e^2=\frac{1}{n-2}\sum_{i=1}^n(y_i-\Hat{y}_i)^2\]
+
+其中，$\hat y_i=\hat\beta_0+\hat\beta_1x_i$，且
+
+\[
+	\mathrm E[S_e^2]=\sigma^2
+\]
+
+并且还有：（证明请见附录\ref{proof16}）
+\[
+	S_e^2=\frac{1}{n-2}(S_{yy}-\hat\beta_1^2S_{xx})
+\]
+
+残差的另外一个重要应用是用来检测建立模型时的假设是否成立。上述建立模型的通常假设是$Y_1,Y_2,\dots,Y_n$满足模型$Y_i=\beta_0+\beta_1x_i+\varepsilon_i$，并且$\varepsilon_i$之间相互独立，还有$\varepsilon_i\sim N(0,\sigma^2)$。现在我们用$\hat e_1,\hat e_2,\dots,\hat e_n$来表示残差，它们的定义是$\hat e_i=y_i-(\hat\beta_0+\hat\beta_1x_i)$。
+
+现在我们知道残差满足以下的性质：（证明请见附录\ref{proof25}）
+\begin{itemize}
+	\item $\sum_{i=1}^n\hat e_i=0$
+	\item $\sum_{i=1}^n\hat e_ix_i=0$
+	\item $\mathrm E[\hat e_i]=0$
+	\item $\mathrm{Var}(\hat e_i)=\sigma^2\left(1-\frac{1}{n}-\frac{(x_i-\bar x)^2}{S_{xx}}\right)$
+\end{itemize}
+
+并且我们把以下公式称作是标准化残差(Standardized Residuals)：
+\[
+	\tilde e_i=\frac{y_i-(\hat\beta_0+\hat\beta_1x_i)}{\sigma\sqrt{1-\frac{1}{n}-\frac{(x_i-\bar x)^2}{S_{xx}}}}
+\]
+
+而将以下公式称作是学生化残差(Studentized Residuals)：
+\[
+	e^*_i=\frac{y_i-(\hat\beta_0+\hat\beta_1x_i)}{S_e\sqrt{1-\frac{1}{n}-\frac{(x_i-\bar x)^2}{S_{xx}}}}
+\]
+
+严格地说，这个学生化残差称作是学生化内残差(Internally Studentized Residuals)，并不符合T分布。我们还可以利用学生化外残差(Externally Studentized Residuals)来解决这个问题。在计算学生化外残差时，上述公式不变，但是使用的线性模型必须去除第$i$个数据。有关于标准化和学生化残差的详细证明，请见附录\ref{proof26}。
+
+\subsubsection{系数符合的分布}
+知道了残差的方差以及系数的计算方式后，我们有：（证明请见\ref{proof20}）
+\[
+	\frac{\Hat{\beta}_0-\beta_0}{S_e\sqrt{\frac{1}{n}+\frac{\Bar{x}^2}{S_{xx}}}}\sim t_{n-2}
+\]
+\[
+	\frac{\Hat{\beta}_1-\beta_1}{S_e/\sqrt{S_{xx}}}\sim t_{n-2}
+\]
+\[
+	\frac{(n-2)S_e^2}{\sigma^2}\sim \chi_{n-2}^2
+\]
+
+其实上述服从T分布的就是检验统计量$Z$，形式和之前假设检验是一样的。分子是估计值减去参数，分母是标准误差。置信区间的算法也和之前的一模一样，此处不再赘述。
+
+\subsection{预测与预测区间}
+得到了关于许多个已知期望和方差，但符合未知分布的$Y_i$的观察值$y_i$的拟合线条以后，我们会希望预测对于一个给定$x_0$，对应的$Y_0$有什么性质。给定一个$x_0$，则$Y_0=\beta_0+\beta_1x_0$，并且满足：(证明请见附录\ref{proof21})
+\begin{itemize}
+	\item $\mathrm{E}[\hat\beta_0+\hat\beta_1x_0]=\beta_0+\beta_1x_0$
+	\item $\mathrm{Var}(\hat\beta_0+\hat\beta_1x_0)=\sigma^2\left(\frac{1}{n}+\frac{(x_0-\bar x)^2}{S_{xx}}\right)$
+\end{itemize}
+
+特别地，如果每个$Y_i$都满足已知正态分布$N(\beta_0+\beta_1x_i,\sigma^2)$，则有：（证明请见附录\ref{proof22}）
+\[
+	\hat\beta_0+\hat\beta_1\sim N\left(\beta_0+\beta_1x_0,\sigma^2\left(\frac{1}{n}+\frac{(x_0-\bar x)^2}{S_{xx}}\right)\right)
+\]
+
+并且在满足$Y_i$正态性的前提下，我们还有：（证明请见附录\ref{proof23}）
+\[
+	\frac{(\hat\beta_0+\hat\beta_1x_0)-(\beta_0+\beta_1x_0)}{S_e\sqrt{\frac{1}{n}+\frac{(x_0-\bar x)^2}{S_{xx}}}}\sim t_{n-2}
+\]
+
+
+我们在之前的学习中已经知道有关于置信区间的知识。对于类似于$\beta_0+\beta_1x_0$这样已知分布的随机变量，我们同样可以计算出这个随机变量在某个置信水平下覆盖的置信区间。它是
+\[
+\Hat{\beta}_0+\Hat{\beta}_1x_0\pm t_{\frac{\alpha}{2},n-2}S_e\sqrt{\frac{1}{n}+\frac{(x_0-\Bar{x})^2}{S_{xx}}}
+\]
+
+其中，$x_0$是回归曲线上的某个值，$S_e$是残差的标准差。$t_{\frac{\alpha}{2},n-2}$是自由度为$n-2$的T分布上的分位数。
+
+这个区间叫做是$\beta_0+\beta_1x_0$的\textbf{置信区间}(Confidence Interval, CI)。现在我们要计算$Y_0$的\textbf{预测区间}(Prediction Interval, PI)的话，公式有一些小小的变动：
+\[
+\Hat{\beta}_0+\Hat{\beta}_1x_0\pm t_{\frac{\alpha}{2},n-2}S_e\sqrt{1+\frac{1}{n}+\frac{(x_0-\Bar{x})^2}{S_{xx}}}
+\]
+
+注意到预测区间和置信区间有本质上的不同，类似于$\beta_0+\beta_1x_0$和$Y_0$之间也有本质的不同一样。这里的置信区间是基于\textbf{估计}的方差而得出的，但是预测区间是根据\textbf{预测}的方差得出的。二者很大程度上是不同的，具体证明可见附录\ref{proof24}。
+\subsection{多元线性回归模型(Multiple Linear Regression, MLR)}
+和一元线性回归模型类似，只是MLR中是几个变量一同决定单个变量。这些变量之间还可能组成乘积等形式（即相互作用）。最简单的一个MLR是
+\[
+Y_i=\beta_0+\beta_1X_{i1}+\beta_1X_{i2}+\cdots+\beta_rX_{ir}+\varepsilon_i
+\]
+\subsection{矩阵表示}
+因为有多个观察数据，所以有多个拟合结果。由线性代数知识易知可以由矩阵表示多元线性方程组。
+
+例如，拥有$r$个变元的简单线性回归模型，可以用这样的矩阵表示：
+\[
+	\begin{pmatrix}
+		Y_1 \\
+		Y_2 \\
+		Y_3 \\
+		\vdots \\
+		Y_n
+	\end{pmatrix}
+	=
+	\begin{pmatrix}
+		1 & x_{11} & x_{12} & x_{13} & \cdots & x_{1r} \\
+		1 & x_{21} & x_{22} & x_{23} & \cdots & x_{2r} \\
+		1 & x_{31} & x_{32} & x_{33} & \cdots & x_{3r} \\
+		\vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+		1 & x_{n1} & x_{n2} & x_{n3} & \cdots & x_{nr}
+	\end{pmatrix}
+	\times
+	\begin{pmatrix}
+		\beta_0 \\
+		\beta_1 \\
+		\beta_2 \\
+		\vdots \\
+		\beta_r
+	\end{pmatrix}
+	+
+	\begin{pmatrix}
+		\varepsilon_1 \\
+		\varepsilon_2 \\
+		\varepsilon_3 \\
+		\vdots \\
+		\varepsilon_n
+	\end{pmatrix}
+\]
+
+化简为
+\[
+	\boldsymbol{Y}=\boldsymbol{X\beta}+\boldsymbol{\varepsilon}
+\]
+
+\subsection{性质}
+$\boldsymbol{X}$中的列向量必须线性无关。若该性质不满足，则无法确定唯一的$\boldsymbol{\beta}$。该性质的证明请见附录\ref{proof27}。
+
+若矩阵$\boldsymbol{X}_{n\times p}$中的列向量线性无关，则$\boldsymbol{X}^T\boldsymbol{X}$矩阵可逆。证明请见附录\ref{proof28}。
+
+
+
+\subsection{最小二乘法}
+和之前的定义类似。我们希望找到$r+1$个值$\beta_0,\beta_1,\beta_2,\dots,\beta_r$使得这个函数最小：
+\[
+Q(\beta_0,\beta_1,\beta_2,\dots.\beta_r)=\sum_{i=1}^n(y_i-(\beta_0+\beta_1x_{i1}+\beta_2x_{i2}+\cdots+\beta_rx_{ir}\varepsilon_i))^2
+\]
+
+并且我们能计算，$\boldsymbol{\hat\beta}=(\boldsymbol{X}^T\boldsymbol{X})^{-1}\boldsymbol{X}^T\boldsymbol{y}$，证明请见附录\ref{proof29}。
+
+残差的方差是：
+\[
+S_e^2=\frac{1}{n-r-1}\sum_{i=1}^n(y_i-(\beta_0+\beta_1x_{i1}+\beta_2x_{i2}+\cdots+\beta_rx_{ir}\varepsilon_i))^2
+\]
+
+而矩阵形式计算的方差是：（证明请见附录\ref{proof30}）
+\[
+	S_e^2=\frac{1}{n-r-1}\lVert\boldsymbol{Y}-\boldsymbol{X\hat\beta}\rVert^2
+\]
+\subsection{判断系数的存在性}
+有的时候部分系数很接近零，我们可以简单地抛弃这些系数不要。怎么决定系数的去留呢？我们之前介绍了和$\beta_i$有关的假设检验，我们把对应的$\beta_i$值直接和零做假设检验，如果概率不小于显著性水平，我们就认为这个对应的$\beta_i$等于零，简化我们的模型。
+\section{评估、诊断模型并对其进行改进}
+\subsection{残差分析}
+\noindent 1.残差的期望值应该是零（线性）。即残差在图中应该大致均匀分布在零周围\\
+2.对于所有残差，从第一个残差往后取任意个残差，这些残差组中的方差应该随机分布在零周围（齐性）。即残差组的方差不随其容量的扩大而存在显著趋势。\\
+3.残差应该满足标准正态分布（正态性）。这一般通过QQ图来判断。\\
+以上任意一个诊断标准不通过，都不能认为从这个模型中已经发掘出了足够的信息（即残差中还隐藏了部分信息）。
+\subsection{相关性系数}
+定义一个相关性系数$r^2$:
+\[
+r^2=\frac{\sum_{i=1^n}(y_i-\Bar{y})^2-\sum_{i=1}^n(y_i-(\beta_0+\beta_1x_i))^2}{\sum_{i=1^n}(y_i-\Bar{y})^2}
+\]
+它的取值在正负一之间。它的绝对值越接近1，说明线性相关性越强。一般绝对值超过0.6就可以说存在线性关系，超过0.8可以说有强烈的线性关系。有的时候我们会希望有一个调整过的$r^2_R$，即
+\[
+r^2_R=1-\frac{n-1}{n-p-1}(1-r^2)
+\]
+其中，$p$是变量个数。
+\subsection{模型改进}
+如果以上诊断标准不通过怎么办？我们希望对模型进行改进以更好地符合上述诊断标准。\\
+\indent 比如说，有的时候两个变量并不是线性关系，我们可以把原先的$x$替换成$\ln{x}$或者是$e^x$（对数、指数等都可以进行尝试，但记得要变形回去），然后再试。
+\section{方差分析(ANOVA)}
+主要用来判断施加了不同影响的组之间的均值是否有明显差异。
+\subsection{单因素方差分析}
+现有一些羊被随机分为5组，其中一组为控制组，喂食普通的饲料，另外4组分别喂食ABCD四种新型饲料。过了一段时间后分别测量每组每只羊体重增长的大小，得到数据。现在想知道，新型饲料和普通饲料对于羊体重增长的效果究竟有没有区别？\\
+\indent 零假设是$H_0: \mu_0=\mu_1=\mu_2=\mu_3=\mu_4$，备择假设是它们的增长量并不全部相等。
+\subsubsection{前提条件}
+为了进行单因素方差分析，我们必须要提前假设这些：\\
+1.这些组之间的数据互相独立，并且每组中的数据都大致符合正态分布（回忆QQ图）。\\
+2.这些组中最大和最小的方差之间不能相差超过一倍。\\
+\subsubsection{如何进行F检验}
+先看这个表格：
+\begin{center}
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline\hline
+         种类&方差和(Sum of Squares, SS)&自由度(DF)&均方差(Mean Squares, MS)&F检验量 \\\hline
+         不同组之间(B)&$\sum_{i=1}^kn_i\left(\Bar{Y}_{i\dots}-\Bar{Y}\right)^2$&k-1&SSB/DFB&MSB/MSW\\\hline
+         组内(W)&$\sum_{i=1}^k\sum_{j=1}^{n_i}\left(Y_{ij}-\Bar{Y}_{i\dots}\right)^2$&n-k&SSW/DFW&~\\\hline
+         总共(T)&$\sum_{i=1}^k\sum_{j=1}^{n_i}\left(Y_{ij}-\Bar{Y}\right)$&n-1&SST/DFT&~\\ \hline\hline
+    \end{tabular}
+\end{center}
+并且我们知道F检验量符合F分布$F(k-1,n-k)$。这是一个有两个自由度的分布，第一个是DFB，第二个是DFW，\textbf{顺序不准颠倒}。\\
+根据检验统计量符合的这个分布，我们进行通常的假设检验，计算p-value，决定是否推翻原假设。
+\subsubsection{最小显著性差异法}
+如果原假设被拒绝，那么我们就知道并不是所有组中的均值都相等。但是如果我们只想知道某两组之间的均值是否有显著差异呢？比如我们想知道AB两种饲料喂养的结果有没有显著差异，这时应该用什么办法呢？这时我们用最小显著性差异法，检验统计量叫做LSD，算法如下：
+\[
+LSD=t_{\frac{\alpha}{2}}(n-k)\sqrt{MSE\left(\frac{1}{n_i}+\frac{1}{n_j}\right)}
+\]
+当两组均值之差（$|\Bar{X}_i-\Bar{X}_j|$）的绝对值大于LSD时，我们就说有显著差异。\\
+有的时候为了避免假阳性，我们会进行一个Bonferroni修正，修正后的LSD看起来是这样的：
+\[
+LSD=t_{\frac{\alpha}{2r}}(n-k)\sqrt{MSE\left(\frac{1}{n_i}+\frac{1}{n_j}\right)}
+\]
+其中，$r$是排列组合数，$r=C_k^2$，$k$是总的组数，这里是5。
+\subsection{单因素方差分析在线性回归中的应用}
+
+\subsection{双因素方差分析}
+
+
+
+\section{附录 Appendix}
+\subsection{证明}
+\subsubsection{唯一最小值的取得}
+\label{proof13}
+通过公式可以获知：
+\begin{align*}
+	q(\nu)&=\sum_{i=1}^n(u_i-\nu)\\
+	&=\sum_{i=1}^n(u_i^2-2u_i\nu+\nu^2)\\
+	&=\sum_{i=1}^nu_i^2-2\sum_{i=1}^nu_i\nu+\sum_{i=1}^n\nu^2
+\end{align*}
+
+然后对其求一阶导
+\begin{align*}
+	\frac{\mathrm dq}{\mathrm d\nu}=-2\sum_{i=1}^nu_i+2\sum_{i=1}^n\nu
+\end{align*}
+
+则当$\nu=\bar u$时，导数等于零。接下来求二阶导，证明导数等于零时，函数取最小值。
+\begin{align*}
+	\frac{\mathrm d^2q}{\mathrm d\nu^2}=2n>0
+\end{align*}
+
+所以函数在$\nu=\bar u$时取得最小值，证毕。
+
+\subsubsection{最小二乘法参数的计算}
+\label{proof14}
+根据最小二乘法的定义（\ref{LSE definition}），我们知道：
+\begin{align*}
+	Q(\beta_0,\beta_1)&=\sum_{i=1}^n(y_i-(\beta_0+\beta_1x_i))^2\\
+	&=\sum_{i=1}^n((y_i-\beta_1x_i)-\beta_0)^2\\
+\end{align*}
+
+所以根据上面的证明（\ref{proof13}），要使得$Q$最小，有$\hat\beta_0=\overline{(y_i-\beta_1x_i)}=\bar y-\beta_1\bar x$，得到$\hat\beta_0$的计算公式。接下来将得到的最优$\hat\beta_0$代入公式中，得到：
+\begin{align*}
+	Q(\hat\beta_0,\beta_1)&=\sum_{i=1}^n(y_i-(\hat\beta_0+\beta_1x_i))^2\\
+	&=\sum_{i=1}^n[y_i-(\bar y-\beta_1\bar x+\beta_1x_i)]^2\\
+	&=\sum_{i=1}^n[(y_i-\bar y)-(x_i-\bar x)\beta_1]^2\\
+\end{align*}
+
+然后我们证明对一列实数$\{u_i\}$和$\{a_i\}$，函数$q(\nu)=\sum_{i=1}^n(u_i-a_i\nu)^2$，它取得最小值当且仅当$\nu=\frac{\sum_{i=1}^na_iu_i}{\sum_{i=1}^na_i^2}$：
+\begin{align*}
+	q(\nu)&=\sum_{i=1}^n(u_i-a_i\nu)^2\\
+	&=\sum_{i=1}^n(u_i^2-2u_ia_i\nu+a_i^2\nu^2)\\
+	&=\sum_{i=1}^nu_i^2-2\nu\sum_{i=1}^na_iu_i+\nu^2\sum_{i=1}^na_i^2\\
+	&=\left(\sum_{i=1}^na_i^2\right)\nu^2-\left(2\sum_{i=1}^na_iu_i\right)+\sum_{i=1}^nu_i^2
+\end{align*}
+
+易知它是开口向上的抛物线，最小值仅在对称轴处取得，此抛物线的对称轴$-\frac{b}{2a}=-\frac{-2\sum_{i=1}^na_iu_i}{2\sum_{i=1}^na_i^2}=\frac{\sum_{i=1}^na_iu_i}{\sum_{i=1}^na_i^2}$。将这个结论用于得到的$Q(\hat\beta_0,\beta_1)$结果，我们能知道只有当$\beta_1=\frac{\sum_{i=1}^n(x_i-\bar x)(y_i-\bar y)}{\sum_{i=1}^n(x_i-\bar x)^2}$时，$Q(\hat\beta_0,\beta_1)$能取得最小值，所以$\hat\beta_1=\frac{S_{xy}}{S_{xx}}$，证毕。
+
+\subsubsection{残差方差的估计}
+\label{proof15}
+（此处证明并不完全）
+
+我们一直使用最小二乘法得出的$\hat\beta_0$和$\hat\beta_1$用作最佳参数。现在我们认为这两个参数存在真值$\beta_0$和$\beta_1$，假若它们的值已知，则有$\varepsilon_i=Y_i-(\beta_0+\beta_1x_i)\sim N(0,\sigma^2)$，于是我们的样本方差就是总体方差的\textbf{无偏估计}，即$\frac{1}{n}\sum_{i=1}^n[(Y_i-(\beta_0+\beta_1x_i))^2]$就可以用于估计$\sigma^2$。
+
+但是在实际操作中，我们总是用$\hat\beta_0$和$\hat\beta_1$来估计真值，这就引入了两个“参数”。自由度的大小总是样本量减去参数个数，所以此处我们将分母替换成$n-2$，以解决此问题。
+%$\mathrm{Var}(\varepsilon_i)=\mathrm E[\varepsilon_i^2]-(\mathrm E[\varepsilon_i])^2=\mathrm E[\varepsilon_i^2]$
+
+\subsubsection{残差方差的另外一种计算方式}
+\label{proof16}
+\begin{align*}
+	S_e^2&=\frac{1}{n-2}\sum_{i=1}^n(y_i-\hat y_i)^2\\
+	&=\frac{1}{n-2}\sum_{i=1}^n[(y_i-(\hat\beta_0+\hat\beta_1x_i))^2]\\
+	&=\frac{1}{n-2}\sum_{i=1}^n(y_i-\bar y+\hat\beta_1\bar x-\hat\beta_1x_i)^2\\
+	&=\frac{1}{n-2}\sum_{i=1}^n[(y_i-\hat y)-(x_i-\bar x)\hat\beta_1]^2\\
+	&=\frac{1}{n-2}\sum_{i=1}^n[(y_i-\bar y)^2-2\hat\beta_1(y_i-\hat y)(x_i-\bar x)+(x_i-\bar x)^2\hat\beta_1^2]\\
+	&=\frac{1}{n-2}(S_{yy}-2\hat\beta_1S_{xy}+S_{xx}\hat\beta_1^2)\\
+\end{align*}
+
+因为$\hat\beta_1=\frac{S_{xy}}{S_{xx}}$，所以$\hat\beta_1S_{xy}=\frac{S_{xy}^2}{S_{xx}}=\hat\beta_1^2S_{xx}$，代入得到
+\begin{align*}
+	S_e^2&=\frac{1}{n-2}(S_{yy}-2\hat\beta_1^2S_{xx}+\hat\beta_1^2S_{xx})\\
+	&=\frac{1}{n-2}(S_{yy}-\hat\beta_1^2S_{xx})
+\end{align*}
+
+证毕。
+
+\subsubsection{最小二乘法的模型系数分布证明}
+\label{proof17}
+首先我们要对最小二乘法（\ref{LSE definition}）中要用到的几个参数进行变形操作，以便于后续证明。
+\begin{align*}
+	S_{xy}&=\sum_{i=1}^n(x_i-\bar x)(y_i-\bar y)\\
+	&=\sum_{i=1}^n[(x_i-\bar x)y_i-(x_i-\bar x)\bar y]\\
+	&=\sum_{i=1}^n(x_i-\bar x)y_i-\bar y\sum_{i=1}^n(x_i-\bar x)\\
+	&=\sum_{i=1}^n(x_i-\bar x)y_i
+\end{align*}
+
+类似地，我们有
+\begin{align*}
+	S_{xx}&=\sum_{i=1}^n(x_i-\bar x)x_i
+\end{align*}
+
+利用化简过后的$S_{xx}$与$S_{xy}$，我们再计算$\hat\beta_0$以及$\hat\beta_1$：
+\begin{align*}
+	\hat\beta_1&=\frac{S_{xy}}{S_{xx}}\\
+	&=\frac{1}{S_{xx}}\sum_{i=1}^n(x_i-\bar x)y_i\\
+	&\text{令$a_i=\frac{(x_i-\bar x)}{S_{xx}}$，则原式}\\
+	&=\sum_{i=1}^na_iy_i\\
+	\hat\beta_0&=\bar y-\hat\beta_1\bar x\\
+	&=\frac{1}{n}\sum_{i=1}^ny_i-\sum_{i=1}^na_iy_i\bar x\\
+	&=\sum_{i=1}^n(\frac{1}{n}-a_i\bar x)y_i\\
+	&\text{令$b_i=\frac{1}{n}-a_i\bar x$，则原式}\\
+	&=\sum_{i=1}^nb_iy_i
+\end{align*}
+
+然后我们先证明$\hat\beta_0$和$\hat\beta_1$的期望。注意到下面的证明使用了上述定义的一些变量。
+\begin{align*}
+	\mathrm E[\hat\beta_1]&=\sum_{i=1}^na_i\mathrm E[y_i]\\
+	&=\sum_{i=1}^n\frac{x_i-\bar x}{S_{xx}}(\beta_0+\beta_1x_i)\\
+	&=\frac{1}{S_{xx}}[\beta_0\sum_{i=1}^n(x_i-\bar x)+\beta_1\sum_{i=1}^n(x_i-\bar x)x_i]\\
+	&\text{因为$\sum_{i=1}^n(x_i-\bar x)=0$，并且$\sum_{i=1}^n(x_i-\bar x)x_i=S_{xx}$，所以原式}\\
+	&=\frac{1}{S_{xx}}\beta_1S_{xx}\\
+	&=\beta_1\\
+	\mathrm E[\hat\beta_0]&=\sum_{i=1}^n\mathrm E[y_i]\\
+	&=\sum_{i=1}^n\left[\left(\frac{1}{n}-\frac{\bar x(x_i-\bar x)}{S_{xx}}\right)(\beta_0+\beta_1x_i)\right]\\
+	&=\frac{1}{n}\sum_{i=1}^n\beta_0-\frac{\beta_0\bar x}{S_{xx}}\sum_{i=1}^n(x_i-\bar x)+\frac{\beta_1}{n}\sum_{i=1}^nx_i-\frac{\beta_1\bar x}{S_{xx}}\sum_{i=1}^n(x_i-\bar x)x_i\\
+	&=\frac{1}{n}\sum_{i=1}^n\beta_0-\frac{\beta_0\bar x}{S_{xx}}\times 0+\frac{\beta_1}{n}n\bar x-\frac{\beta_1\bar x}{S_{xx}}S_{xx}\\
+	&=\beta_0+\beta_1\bar x-\beta_1\bar x\\
+	&=\beta_0
+\end{align*}
+
+接下来我们证明它们的方差，其中仍然使用到了上述定义的两个变量$a_i$和$b_i$。
+\begin{align*}
+	\mathrm{Var}(\hat\beta_1)&=\sum_{i=1}^na_i^2\mathrm(y_i)\\
+	&=\sum_{i=1}^n\left(\frac{x_i-\bar x}{S_{xx}}\right)^2\sigma^2\\
+	&=\frac{\sigma^2}{S_{xx}}^2\sum_{i=1}^n(x_i-\bar x)^2\\
+	&=\frac{\sigma^2}{S_{xx}}^2S_{xx}\\
+	&=\frac{\sigma^2}{S_{xx}}\\
+	\mathrm{Var}(\hat\beta_0)&=\sum_{i=1}^nb_i^2\mathrm{Var}(y_i)\\
+	&=\sum_{i=1}^n\left[\left(\frac{1}{n}-\frac{\bar x(x_i-\bar x)}{S_{xx}}\right)^2\sigma^2\right]\\
+	&=\sigma^2\sum_{i=1}^n\left(\frac{1}{n^2}-\frac{2\bar x(x_i-\bar x)}{nS_{xx}}+\frac{\bar x^2(x_i-\bar x)^2}{S_{xx}^2}\right)\\
+	&=\sigma^2\left(\frac{1}{n}-\frac{2\bar x}{nS_{xx}}\sum_{i=1}^n(x_i-\bar x)+\frac{\bar x^2}{S_{xx}^2}\sum_{i=1}^n(x_i-\bar x)^2\right)\\
+	&=\sigma^2\left(\frac{1}{n}-\frac{2\bar x}{nS_{xx}}\times 0+\frac{\bar x^2}{S_{xx}^2}S_{xx}\right)\\
+	&=\sigma^2\left(\frac{1}{n}+\frac{\bar x^2}{S_{xx}}\right)
+\end{align*}
+
+\subsubsection{最小二乘法系数的协方差证明}
+\label{proof18}
+\begin{align*}
+	\mathrm{Cov}(\hat\beta_0,\hat\beta_1)&=\mathrm{Cov}(\sum_{i=1}^nb_iy_i,\sum_{j=1}^na_jy_j)\\
+	&=\sum_{i=1}^n\sum_{j=1}^nb_ia_j\mathrm{Cov}(y_i,y_j)\\
+	&=\sum_{i=1}^n\left[b_ia_i\mathrm{Cov}(y_i,y_i)+\sum_{\substack{i=1\\j=1\\i\neq j}}^nb_ia_j\mathrm{Cov}(y_i,y_j)\right]\\
+	&=\sum_{i=1}^n\left[b_ia_i\mathrm{Var}(y_i)+\sum_{\substack{i=1\\j=1\\i\neq j}}^nb_ia_j\times 0\right]\text{（已知$y_i$之间相互独立，所以协方差等于零）}\\
+	&=\sum_{i=1}^na_ib_i\mathrm{Var}(y_i)\\
+	&=\sigma^2\sum_{i=1}^n\frac{x_i-\bar x}{S_{xx}}\left(\frac{1}{n}-\frac{\bar x(x_i-\bar x)}{S_{xx}}\right)\\
+	&=\frac{\sigma^2}{S_{xx}}\left[\frac{1}{n}\sum_{i=1}^n(x_i-\bar x)-\frac{\bar x}{S_{xx}}\sum_{i=1}^n(x_i-\bar x)^2\right]\\
+	&=\frac{\sigma^2}{S_{xx}}\left[\frac{1}{n}\times 0-\frac{\bar x}{S_{xx}}S_{xx}\right]\\
+	&=\frac{\sigma^2}{S_{xx}}\times-\bar x\\
+	&=-\frac{\sigma\bar x^2}{S_{xx}}
+\end{align*}
+
+\subsubsection{最小二乘法系数分布的证明1}
+\label{proof19}
+（此证明暂时不要求掌握）
+
+\subsubsection{最小二乘法系数分布的证明2}
+\label{proof20}
+（此证明暂时不要求掌握）
+
+\subsubsection{预测值分布的证明1}
+\label{proof21}
+
+\subsubsection{预测值分布的证明2}
+\label{proof22}
+
+\subsubsection{预测值分布的证明3}
+\label{proof23}
+
+\subsubsection{预测区间和置信区间的不同}
+\label{proof24}
+
+\subsubsection{残差满足的性质}
+\label{proof25}
+
+\subsubsection{残差的标准化与学生化}
+\label{proof26}
+（此证明不要求掌握）
+
+\subsubsection{列向量必须线性无关}
+\label{proof27}
+
+\subsubsection{列线性无关的矩阵性质1}
+\label{proof28}
+
+\subsubsection{多元最小二乘法系数的计算}
+\label{proof29}
+
+\subsubsection{多元最小二乘法残差的计算}
+\label{proof30}
+
+
+\end{document}
