@@ -1,4 +1,4 @@
-\documentclass[UTF8]{ctexart}
+\documentclass[UTF8]{ctexbook}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
@@ -7,32 +7,298 @@
 \usepackage{xeCJKfntef}
 \usepackage{hyperref}
 \usepackage{biblatex}
+\usepackage{harpoon}
+\usepackage{enumitem}
+
+\setlist[description]{leftmargin=\parindent,labelindent=\parindent}
 \geometry{scale=0.85,a4paper}
 \everymath{\displaystyle}
 \xeCJKsetup{underline = {skip = false}}
 
-\title{Maxwell General Learning System Academic\\ Statistics Modeling\\ 麦克斯韦通用高等习得系统\\ 统计建模}
+\makeatletter
+% \overarrow@ and \arrowfill@ are defined in amsmath
+\newcommand*{\overrightharpoonup}{\mathpalette{\overarrow@\rightharpoonupfill@}}
+\newcommand*{\rightharpoonupfill@}{\arrowfill@\relbar\relbar\rightharpoonup}
+\makeatother
+
+\DeclareFontFamily{U}{matha}{\hyphenchar\font45}
+\DeclareFontShape{U}{matha}{m}{n}{
+      <5> <6> <7> <8> <9> <10> gen * matha
+      <10.95> matha10 <12> <14.4> <17.28> <20.74> <24.88> matha12
+      }{}
+\DeclareSymbolFont{matha}{U}{matha}{m}{n}
+\DeclareMathSymbol{\varrightharpoonup}{3}{matha}{"E1}
+\let\Vector\overrightharpoonup
+
+\let\cleardoublepage\clearpage % remove unwanted blank pages
+
+\title{Maxwell General Learning System Academic\\ Statistical Modeling\\ 麦克斯韦通用高等习得系统\\ 统计建模}
 \author{Leo\_Maxwell }
 \date{March 2023}
 
 \begin{document}
 
 \maketitle
-\vfill
-\begin{center}
-\textbf{Good Explanation\textgreater Symbolic Proof.}
-\end{center}
-\vfill
 
-\newpage
 \tableofcontents
 \newpage
 
-\section*{序言 Introduction}
-本文主要讲了如何通过运用统计方法建立数学模型并进行分析。
+\chapter*{序言 Introduction}
+本书主要讲了如何通过运用统计方法建立数学模型并进行分析。
 
 您至少需要掌握《综合统计学》中大部分的初等统计学知识才能使用这份文档。
 
+\chapter{统计量推广 Generalization of Statistical Values}
+\section{随机矩阵 Random Matrices}
+
+定义：若一个向量或矩阵中的每一个元素都是一个随机变量，则称该向量或矩阵为随机向量或随机矩阵。
+
+下文如无特殊说明不再区分随机矩阵和随机向量。
+\section{期望 (Mean)}
+对随机矩阵$\boldsymbol{X}$而言，其期望是一个尺寸相同的矩阵，并且对应位置的元素为该元素的期望值。
+
+容易证明随机矩阵的期望满足一般期望的所有性质。
+\section{方差 (Variance)}
+此处的方差仅针对随机向量定义。对随机向量$\Vector{X}=(X_1,X_2,X_3,\dots,X_n)$，定义其方差$\mathrm{Var}(\Vector{X})$为一$n\times n$的矩阵$\Sigma$，其中第$i$行第$j$列的元素$\Sigma_{ij}=\mathrm{Cov}(X_i,X_j)$.
+
+它和一般的方差性质的区别主要在以下这一条：对长度为$n$，方差为$\boldsymbol{\Sigma}$的随机向量$\Vector{X}$（列向量）和尺寸为$m\times n$的矩阵$\boldsymbol{A}$和与$\Vector{X}$同尺寸的向量$\Vector{b}$，有：（证明见\ref{proof:vector-var-prop}）
+\[
+	\mathrm{Var}(\boldsymbol{A}\Vector{X}+\Vector{b})=\boldsymbol{A}\boldsymbol{\Sigma}\boldsymbol{A}^T
+\]
+\section{分布表示 Distribution Notation}
+对一个长度为$n$的随机向量$\Vector{X}$而言，如果它符合期望是$\Vector{\mu}$，方差是矩阵$\boldsymbol{\Sigma}$的$n$元正态分布，则记：
+\[
+	\Vector{X}\sim N_n(\Vector{\mu}, \boldsymbol{\Sigma})
+\]
+
+\chapter{回归分析 (Regression Analysis)}
+对存在一定关系的两个随机变量而言，我们希望用一个代数意义上的函数来描述这两个变量之间的关系。
+
+由于它们都是随机变量，所以天然地存在不确定性，不可能存在传统意义上的$y=f(x)$的数学关系。然而，如果我们能设法得到$\mathrm E[Y]=\mathrm E[f(X)]$这样的关系，即\CJKunderline{使用随机变量的期望作为其主要取值，然后得到函数关系}，由于现实世界里得到的绝大多数数据本质上都是随机变量，所以获得这种关系的努力有显著的现实意义。
+
+例如，一般来说体重越重的人身高也越高，但很显然，在人群中，这两个量都是随机变量。它们存在什么样的关系呢？我们希望用一个上述的函数来描述这种关系。
+
+\section{定义}
+对$(x_{11},x_{12}, x_{13}, \dots, x_{1p},y_1),(x_{21}, x_{22}, x_{23}, \dots, x_{2p}, y_2),(x_{31},x_{32}, x_{33}, \dots, x_{3p}, y_3), \dots,(x_{n1}, x_{n2}, x_{n3}, \dots, x_{np},y_n)$而言，如果存在一组$\beta_j, j=0,1,2,\dots, p$，使得$y_i$能够被以下的式子表达：
+\[
+y_i=\beta_0+\sum_{j=1}^p\beta_jx_j+\varepsilon_i
+\]
+
+并且成立以下条件：
+\begin{description}
+	\item [残差的期望为零：]$\mathrm E[\Vector{\varepsilon}]=\Vector{0}$
+	\item [每个残差的方差都相同，且互不相关：]$\mathrm{Var}(\Vector{\varepsilon})=\sigma^2\boldsymbol{I}$
+\end{description}
+
+或是一个更严格的条件：
+\[
+	\Vector{\varepsilon}\sim N(\Vector{0}, \sigma^2\boldsymbol{I})
+\]
+
+则称这些公式和数字构成一个\textbf{简单线性回归模型(Simple Linear Regression Model, SLR Model)}。
+
+其中，所有$x$被称为\textbf{自变量}，所有$y$被称为\textbf{因变量}，所有$\varepsilon$被称为\textbf{残差}。于是该定义是直观的：它试图通过已经获得的大量数据推知许多个$\beta$，然后再通过这些$\beta$和已知的自变量推知因变量。
+
+该定义通过引入残差将随机性从自变量和因变量中去除了，即残差本身概括了自变量和因变量的所有随机特征。
+
+容易知道这种关系可以通过矩阵表示：
+\[
+	\begin{pmatrix}
+		y_1 \\
+		y_2 \\
+		y_3 \\
+		\vdots \\
+		y_n
+	\end{pmatrix}
+	=
+	\begin{pmatrix}
+		1 & x_{11} & x_{12} & x_{13} & \cdots & x_{1p} \\
+		1 & x_{21} & x_{22} & x_{23} & \cdots & x_{2p} \\
+		1 & x_{31} & x_{32} & x_{33} & \cdots & x_{3p} \\
+		\vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+		1 & x_{n1} & x_{n2} & x_{n3} & \cdots & x_{np}
+	\end{pmatrix}
+	\times
+	\begin{pmatrix}
+		\beta_0 \\
+		\beta_1 \\
+		\beta_2 \\
+		\vdots \\
+		\beta_p
+	\end{pmatrix}
+	+
+	\begin{pmatrix}
+		\varepsilon_1 \\
+		\varepsilon_2 \\
+		\varepsilon_3 \\
+		\vdots \\
+		\varepsilon_n
+	\end{pmatrix}
+\]
+
+化简为
+\[
+	\boldsymbol{Y}=\boldsymbol{X\beta}+\boldsymbol{\varepsilon}
+\]
+
+即得到简单线性回归模型的一般表示。其中，矩阵$\boldsymbol{X}$被称作是\textbf{设计矩阵（Design Matrix）}。
+
+
+\section{最小二乘法(Least Square Estimation, LSE)}
+\label{LSE definition}
+使得下列多元函数取得最小值的一组$\beta$，就是用最小二乘法得出的理想的$\boldsymbol{\beta}$，我们记为$\boldsymbol{\hat\beta}$。
+\[
+Q(\beta_0,\beta_1,\beta_2,\dots,\beta_p)=\sum_{i=1}^n(y_i-(\beta_0+\sum_{j=1}^p\beta_jx_j))^2
+\]
+
+所以其得名最小二乘法。
+
+该函数可使用线性代数表示，为$\Vert\boldsymbol{Y}-\boldsymbol{X\beta}\Vert^2$，此处定义的范数是Euclidean范数。
+
+\subsection{系数计算 The Calculation of $\boldsymbol{\hat\beta}$}
+$\boldsymbol{\hat\beta}$可通过以下方式计算：（证明请见\ref{proof:LSE-matrix-calc}）
+
+\[
+	\boldsymbol{\hat\beta}=(\boldsymbol{X}^T\boldsymbol{X})^{-1}\boldsymbol{X}^T\boldsymbol{Y}
+\]
+
+%
+%残差的方差是：
+%\[
+%S_e^2=\frac{1}{n-r-1}\sum_{i=1}^n(y_i-(\beta_0+\beta_1x_{i1}+\beta_2x_{i2}+\cdots+\beta_rx_{ir}\varepsilon_i))^2
+%\]
+%
+%而矩阵形式计算的方差是：（证明请见附录\ref{proof30}）
+%\[
+%	S_e^2=\frac{1}{n-r-1}\lVert\boldsymbol{Y}-\boldsymbol{X\hat\beta}\rVert^2
+%\]
+
+%\subsection{系数计算和性质}
+%对于$\Hat{\beta}_1$和$\Hat{\beta}_0$，我们有
+%\[
+%	\Hat{\beta}_1=\frac{S_{xy}}{S_{xx}}
+%\]
+%\[
+%	\Hat{\beta}_0=\Bar{y}-\hat\beta_1\Bar{x}
+%\]
+%
+%其中，$S_{xy}$被称作cross product sum of squares，$S_{xx}$被称作sum of squares due to $x$，计算方式如下：
+%\[
+%	S_{xy}=\sum_{i=1}^n(x_i-\Bar{x})(y_i-\Bar{y})
+%\]
+%\[
+%	S_{xx}=\sum_{i=1}^n(x_i-\Bar{x})^2
+%\]
+%
+%现在我们回到概率统计的框架中来。因为线性回归是对许多组成对数据$(x_i,y_i)$进行操作，而这些成对数据中的$y_i$一般都是在相同$x_i$的条件下多次重复实验得到的，或者是从一个未知分布中随机抽取得到的值（例如从一群身高相同的人中抽取一个人的体重），所以线性回归的对象一般都是一列互相独立的随机变量$Y_1,Y_2,\dots,Y_n$，我们假设它们满足$\mathrm E[Y_i]=\beta_0+\beta_1x_i$和$\mathrm{Var}(Y_i)=\sigma^2$，其中，$x_i$就是上述许多组成对数据中的$x_i$。于是，$\hat\beta_0$和$\hat\beta_1$就从两个数字变成两个随机变量。作为随机变量，它们必然是拥有随机变量的属性的，在这里给出：（证明请见附录\ref{proof17}）
+%\begin{center}
+%    \begin{tabular}{|c|c|c|}
+%    \hline\hline
+%         &期望&方差  \\\hline
+%         $\hat\beta_0$& $\beta_0$ & $\sigma^2\left(\frac{1}{n}+\frac{\Bar{x}^2}{S_{xx}}\right)$\\\hline
+%         $\hat\beta_1$& $\beta_1$ & $\frac{\sigma^2}{S_{xx}}$\\ \hline\hline
+%    \end{tabular}
+%\end{center}
+%
+%特别地，$\mathrm{Cov}(\hat\beta_0,\hat\beta_1)=-\frac{\bar x\sigma^2}{S_{xx}}$，证明请见\ref{proof18}。
+%
+%如果我们的数据能够满足$Y_i\sim N(\beta_0+\beta_1x_i,\sigma^2)$，且每个$Y_i$之间相互独立，那么还有性质：（证明请见附录\ref{proof19}）
+%\begin{align*}
+%	\hat\beta_0&\sim N\left(\beta_0,\sigma^2\left(\frac{1}{n}+\frac{\bar x}{S_{xx}}\right)\right)\\
+%	\hat\beta_1&\sim N\left(\beta_1,\frac{\sigma^2}{S_{xx}}\right)\\
+%	\frac{(n-2)S_e^2}{\sigma^2}&\sim\chi_{n-2}^2
+%\end{align*}
+%\subsection{残差的性质}
+%在定义中我们提到，对我们的线性回归模型而言，残差符合正态分布$N(0,\sigma^2)$。所以在这里残差也是随机变量，只要是随机变量，我们就研究它的性质。该分布中只有一个参数是我们未知的，所以我们接下来推测这个参数$\sigma^2$。
+%
+%我们仍然用样本的方差$S_e^2$来估计总体方差$\sigma^2$，如同我们之前做过的那样：（说明请见附录\ref{proof15}）
+%\[S_e^2=\frac{1}{n-2}\sum_{i=1}^n(y_i-\Hat{y}_i)^2\]
+%
+%其中，$\hat y_i=\hat\beta_0+\hat\beta_1x_i$，且
+%
+%\[
+%	\mathrm E[S_e^2]=\sigma^2
+%\]
+%
+%并且还有：（证明请见附录\ref{proof16}）
+%\[
+%	S_e^2=\frac{1}{n-2}(S_{yy}-\hat\beta_1^2S_{xx})
+%\]
+%
+%残差的另外一个重要应用是用来检测建立模型时的假设是否成立。上述建立模型的通常假设是$Y_1,Y_2,\dots,Y_n$满足模型$Y_i=\beta_0+\beta_1x_i+\varepsilon_i$，并且$\varepsilon_i$之间相互独立，还有$\varepsilon_i\sim N(0,\sigma^2)$。现在我们用$\hat e_1,\hat e_2,\dots,\hat e_n$来表示残差，它们的定义是$\hat e_i=y_i-(\hat\beta_0+\hat\beta_1x_i)$。
+%
+%现在我们知道残差满足以下的性质：（证明请见附录\ref{proof25}）
+%\begin{itemize}
+%	\item $\sum_{i=1}^n\hat e_i=0$
+%	\item $\sum_{i=1}^n\hat e_ix_i=0$
+%	\item $\mathrm E[\hat e_i]=0$
+%	\item $\mathrm{Var}(\hat e_i)=\sigma^2\left(1-\frac{1}{n}-\frac{(x_i-\bar x)^2}{S_{xx}}\right)$
+%\end{itemize}
+%
+%并且我们把以下公式称作是标准化残差(Standardized Residuals)：
+%\[
+%	\tilde e_i=\frac{y_i-(\hat\beta_0+\hat\beta_1x_i)}{\sigma\sqrt{1-\frac{1}{n}-\frac{(x_i-\bar x)^2}{S_{xx}}}}
+%\]
+%
+%而将以下公式称作是学生化残差(Studentized Residuals)：
+%\[
+%	e^*_i=\frac{y_i-(\hat\beta_0+\hat\beta_1x_i)}{S_e\sqrt{1-\frac{1}{n}-\frac{(x_i-\bar x)^2}{S_{xx}}}}
+%\]
+%
+%严格地说，这个学生化残差称作是学生化内残差(Internally Studentized Residuals)，并不符合T分布。我们还可以利用学生化外残差(Externally Studentized Residuals)来解决这个问题。在计算学生化外残差时，上述公式不变，但是使用的线性模型必须去除第$i$个数据。有关于标准化和学生化残差的详细证明，请见附录\ref{proof26}。
+%
+%\subsection{系数符合的分布}
+%知道了残差的方差以及系数的计算方式后，我们有：（证明请见\ref{proof20}）
+%\[
+%	\frac{\Hat{\beta}_0-\beta_0}{S_e\sqrt{\frac{1}{n}+\frac{\Bar{x}^2}{S_{xx}}}}\sim t_{n-2}
+%\]
+%\[
+%	\frac{\Hat{\beta}_1-\beta_1}{S_e/\sqrt{S_{xx}}}\sim t_{n-2}
+%\]
+%\[
+%	\frac{(n-2)S_e^2}{\sigma^2}\sim \chi_{n-2}^2
+%\]
+%
+%其实上述服从T分布的就是检验统计量$Z$，形式和之前假设检验是一样的。分子是估计值减去参数，分母是标准误差。置信区间的算法也和之前的一模一样，此处不再赘述。
+%
+%\subsection{预测与预测区间}
+%得到了关于许多个已知期望和方差，但符合未知分布的$Y_i$的观察值$y_i$的拟合线条以后，我们会希望预测对于一个给定$x_0$，对应的$Y_0$有什么性质。给定一个$x_0$，则$Y_0=\beta_0+\beta_1x_0$，并且满足：(证明请见附录\ref{proof21})
+%\begin{itemize}
+%	\item $\mathrm{E}[\hat\beta_0+\hat\beta_1x_0]=\beta_0+\beta_1x_0$
+%	\item $\mathrm{Var}(\hat\beta_0+\hat\beta_1x_0)=\sigma^2\left(\frac{1}{n}+\frac{(x_0-\bar x)^2}{S_{xx}}\right)$
+%\end{itemize}
+%
+%特别地，如果每个$Y_i$都满足已知正态分布$N(\beta_0+\beta_1x_i,\sigma^2)$，则有：（证明请见附录\ref{proof22}）
+%\[
+%	\hat\beta_0+\hat\beta_1\sim N\left(\beta_0+\beta_1x_0,\sigma^2\left(\frac{1}{n}+\frac{(x_0-\bar x)^2}{S_{xx}}\right)\right)
+%\]
+%
+%并且在满足$Y_i$正态性的前提下，我们还有：（证明请见附录\ref{proof23}）
+%\[
+%	\frac{(\hat\beta_0+\hat\beta_1x_0)-(\beta_0+\beta_1x_0)}{S_e\sqrt{\frac{1}{n}+\frac{(x_0-\bar x)^2}{S_{xx}}}}\sim t_{n-2}
+%\]
+%
+%
+%我们在之前的学习中已经知道有关于置信区间的知识。对于类似于$\beta_0+\beta_1x_0$这样已知分布的随机变量，我们同样可以计算出这个随机变量在某个置信水平下覆盖的置信区间。它是
+%\[
+%\Hat{\beta}_0+\Hat{\beta}_1x_0\pm t_{\frac{\alpha}{2},n-2}S_e\sqrt{\frac{1}{n}+\frac{(x_0-\Bar{x})^2}{S_{xx}}}
+%\]
+%
+%其中，$x_0$是回归曲线上的某个值，$S_e$是残差的标准差。$t_{\frac{\alpha}{2},n-2}$是自由度为$n-2$的T分布上的分位数。
+%
+%这个区间叫做是$\beta_0+\beta_1x_0$的\textbf{置信区间}(Confidence Interval, CI)。现在我们要计算$Y_0$的\textbf{预测区间}(Prediction Interval, PI)的话，公式有一些小小的变动：
+%\[
+%\Hat{\beta}_0+\Hat{\beta}_1x_0\pm t_{\frac{\alpha}{2},n-2}S_e\sqrt{1+\frac{1}{n}+\frac{(x_0-\Bar{x})^2}{S_{xx}}}
+%\]
+%
+%注意到预测区间和置信区间有本质上的不同，类似于$\beta_0+\beta_1x_0$和$Y_0$之间也有本质的不同一样。这里的置信区间是基于\textbf{估计}的方差而得出的，但是预测区间是根据\textbf{预测}的方差得出的。二者很大程度上是不同的，具体证明可见附录\ref{proof24}。
+
+\chapter{分类模型 Classification Models}
+\section{线性判别分析(Linear Discriminant Analysis, LDA)}
+
+\section{二次判别分析(Quadratic Discriminant Analysis, QDA)}
+
+\chapter{差异检验模型}
 \section{常用的假设检验模型}
 \subsection{检验样本中的占比和总体中的占比是否有显著差异的模型}
 已知澳大利亚所有公民中患哮喘的比例是7\%，现抽取澳大利亚某一特定群体中的200人进行调查，发现24人患有哮喘，请问能不能认为这一特定群体的患病率与澳大利亚总体的患病率有显著差异？该样本患病率的置信区间是多少？（置信水平为95\%）\\
@@ -171,224 +437,13 @@
         \hline\hline
     \end{tabular}\\
 \end{center}
-\section{线性模型(Linear Model, LM)}
-\subsection{基本概念}
-有两个变量，这两个变量之间\textbf{存在联系，但不是函数关系}，但是我们希望用一个代数意义上的函数来描述这两个变量之间的相关性（即拟合）。例如，一般来说体重越重的人身高也越高，但是究竟大概是什么样的关系呢？我们希望用一个函数来描述这种关系。而一元线性回归就是指对于两个变量之间线性的关系进行拟合（其中一个变量对另外一个变量造成影响）。
-
-现在有许多组数据，$(x_1,y_1),\ (x_2,y_2)\ ,\dots,\ (x_n,y_n)$，在简单的一元线性回归中，我们希望找到一个这样的函数关系：
-\[
-Y_i=\beta_0+\beta_1X_i+\varepsilon_i
-\]
-
-其中，$Y_i$是观测数据中真正的值，$\beta_0$是截距，$\beta_1$是斜率，最为重要的是$\varepsilon_i$，它是残差，也是这个公式中的“随机组成部分”，即拟合值与真实值之间的差距。如果把残差去掉，剩下的部分就是一个简单的一次函数。而且我们希望，在这样的模型下，对于残差而言，有$\varepsilon_i\sim N(0,\sigma^2)$，并且相互独立。这样的模型叫做简单线性回归模型(Simple Linear Regression Model, SLR Model)。在后面我们会知道无论是什么关系都可以转换成线性关系，从而构建线性模型。
-\subsection{最小二乘法(Least Square Estimation, LSE)}
-\label{LSE definition}
-使得下列二元函数最小的$\beta_0$和$\beta_1$，就是用最小二乘法得出的理想的$\beta_0$和$\beta_1$，我们记为$\hat\beta_0$和$\hat\beta_1$。
-\[
-Q(\beta_0,\beta_1)=\sum_{i=1}^n(y_i-(\beta_0+\beta_1x_i))^2
-\]
-
-所以其得名最小二乘法。因为若$u_1,u_2,u_3,\dots,u_n$是一列实数，则函数$q(\gamma)=\sum_{i=1}^n(u_i-\gamma)^2$\textbf{仅在}$\gamma=\bar u$时取得最小值（证明请见附录\ref{proof13}），所以我们能通过以下方式计算得到$\hat\beta_0$和$\hat\beta_1$的值，证明请见附录\ref{proof14}。
-\subsubsection{系数计算和性质}
-对于$\Hat{\beta}_1$和$\Hat{\beta}_0$，我们有
-\[
-	\Hat{\beta}_1=\frac{S_{xy}}{S_{xx}}
-\]
-\[
-	\Hat{\beta}_0=\Bar{y}-\hat\beta_1\Bar{x}
-\]
-
-其中，$S_{xy}$被称作cross product sum of squares，$S_{xx}$被称作sum of squares due to $x$，计算方式如下：
-\[
-	S_{xy}=\sum_{i=1}^n(x_i-\Bar{x})(y_i-\Bar{y})
-\]
-\[
-	S_{xx}=\sum_{i=1}^n(x_i-\Bar{x})^2
-\]
-
-现在我们回到概率统计的框架中来。因为线性回归是对许多组成对数据$(x_i,y_i)$进行操作，而这些成对数据中的$y_i$一般都是在相同$x_i$的条件下多次重复实验得到的，或者是从一个未知分布中随机抽取得到的值（例如从一群身高相同的人中抽取一个人的体重），所以线性回归的对象一般都是一列互相独立的随机变量$Y_1,Y_2,\dots,Y_n$，我们假设它们满足$\mathrm E[Y_i]=\beta_0+\beta_1x_i$和$\mathrm{Var}(Y_i)=\sigma^2$，其中，$x_i$就是上述许多组成对数据中的$x_i$。于是，$\hat\beta_0$和$\hat\beta_1$就从两个数字变成两个随机变量。作为随机变量，它们必然是拥有随机变量的属性的，在这里给出：（证明请见附录\ref{proof17}）
-\begin{center}
-    \begin{tabular}{|c|c|c|}
-    \hline\hline
-         &期望&方差  \\\hline
-         $\hat\beta_0$& $\beta_0$ & $\sigma^2\left(\frac{1}{n}+\frac{\Bar{x}^2}{S_{xx}}\right)$\\\hline
-         $\hat\beta_1$& $\beta_1$ & $\frac{\sigma^2}{S_{xx}}$\\ \hline\hline
-    \end{tabular}
-\end{center}
-
-特别地，$\mathrm{Cov}(\hat\beta_0,\hat\beta_1)=-\frac{\bar x\sigma^2}{S_{xx}}$，证明请见\ref{proof18}。
-
-如果我们的数据能够满足$Y_i\sim N(\beta_0+\beta_1x_i,\sigma^2)$，且每个$Y_i$之间相互独立，那么还有性质：（证明请见附录\ref{proof19}）
-\begin{align*}
-	\hat\beta_0&\sim N\left(\beta_0,\sigma^2\left(\frac{1}{n}+\frac{\bar x}{S_{xx}}\right)\right)\\
-	\hat\beta_1&\sim N\left(\beta_1,\frac{\sigma^2}{S_{xx}}\right)\\
-	\frac{(n-2)S_e^2}{\sigma^2}&\sim\chi_{n-2}^2
-\end{align*}
-\subsubsection{残差的性质}
-在定义中我们提到，对我们的线性回归模型而言，残差符合正态分布$N(0,\sigma^2)$。所以在这里残差也是随机变量，只要是随机变量，我们就研究它的性质。该分布中只有一个参数是我们未知的，所以我们接下来推测这个参数$\sigma^2$。
-
-我们仍然用样本的方差$S_e^2$来估计总体方差$\sigma^2$，如同我们之前做过的那样：（说明请见附录\ref{proof15}）
-\[S_e^2=\frac{1}{n-2}\sum_{i=1}^n(y_i-\Hat{y}_i)^2\]
-
-其中，$\hat y_i=\hat\beta_0+\hat\beta_1x_i$，且
-
-\[
-	\mathrm E[S_e^2]=\sigma^2
-\]
-
-并且还有：（证明请见附录\ref{proof16}）
-\[
-	S_e^2=\frac{1}{n-2}(S_{yy}-\hat\beta_1^2S_{xx})
-\]
-
-残差的另外一个重要应用是用来检测建立模型时的假设是否成立。上述建立模型的通常假设是$Y_1,Y_2,\dots,Y_n$满足模型$Y_i=\beta_0+\beta_1x_i+\varepsilon_i$，并且$\varepsilon_i$之间相互独立，还有$\varepsilon_i\sim N(0,\sigma^2)$。现在我们用$\hat e_1,\hat e_2,\dots,\hat e_n$来表示残差，它们的定义是$\hat e_i=y_i-(\hat\beta_0+\hat\beta_1x_i)$。
-
-现在我们知道残差满足以下的性质：（证明请见附录\ref{proof25}）
-\begin{itemize}
-	\item $\sum_{i=1}^n\hat e_i=0$
-	\item $\sum_{i=1}^n\hat e_ix_i=0$
-	\item $\mathrm E[\hat e_i]=0$
-	\item $\mathrm{Var}(\hat e_i)=\sigma^2\left(1-\frac{1}{n}-\frac{(x_i-\bar x)^2}{S_{xx}}\right)$
-\end{itemize}
-
-并且我们把以下公式称作是标准化残差(Standardized Residuals)：
-\[
-	\tilde e_i=\frac{y_i-(\hat\beta_0+\hat\beta_1x_i)}{\sigma\sqrt{1-\frac{1}{n}-\frac{(x_i-\bar x)^2}{S_{xx}}}}
-\]
-
-而将以下公式称作是学生化残差(Studentized Residuals)：
-\[
-	e^*_i=\frac{y_i-(\hat\beta_0+\hat\beta_1x_i)}{S_e\sqrt{1-\frac{1}{n}-\frac{(x_i-\bar x)^2}{S_{xx}}}}
-\]
-
-严格地说，这个学生化残差称作是学生化内残差(Internally Studentized Residuals)，并不符合T分布。我们还可以利用学生化外残差(Externally Studentized Residuals)来解决这个问题。在计算学生化外残差时，上述公式不变，但是使用的线性模型必须去除第$i$个数据。有关于标准化和学生化残差的详细证明，请见附录\ref{proof26}。
-
-\subsubsection{系数符合的分布}
-知道了残差的方差以及系数的计算方式后，我们有：（证明请见\ref{proof20}）
-\[
-	\frac{\Hat{\beta}_0-\beta_0}{S_e\sqrt{\frac{1}{n}+\frac{\Bar{x}^2}{S_{xx}}}}\sim t_{n-2}
-\]
-\[
-	\frac{\Hat{\beta}_1-\beta_1}{S_e/\sqrt{S_{xx}}}\sim t_{n-2}
-\]
-\[
-	\frac{(n-2)S_e^2}{\sigma^2}\sim \chi_{n-2}^2
-\]
-
-其实上述服从T分布的就是检验统计量$Z$，形式和之前假设检验是一样的。分子是估计值减去参数，分母是标准误差。置信区间的算法也和之前的一模一样，此处不再赘述。
-
-\subsection{预测与预测区间}
-得到了关于许多个已知期望和方差，但符合未知分布的$Y_i$的观察值$y_i$的拟合线条以后，我们会希望预测对于一个给定$x_0$，对应的$Y_0$有什么性质。给定一个$x_0$，则$Y_0=\beta_0+\beta_1x_0$，并且满足：(证明请见附录\ref{proof21})
-\begin{itemize}
-	\item $\mathrm{E}[\hat\beta_0+\hat\beta_1x_0]=\beta_0+\beta_1x_0$
-	\item $\mathrm{Var}(\hat\beta_0+\hat\beta_1x_0)=\sigma^2\left(\frac{1}{n}+\frac{(x_0-\bar x)^2}{S_{xx}}\right)$
-\end{itemize}
-
-特别地，如果每个$Y_i$都满足已知正态分布$N(\beta_0+\beta_1x_i,\sigma^2)$，则有：（证明请见附录\ref{proof22}）
-\[
-	\hat\beta_0+\hat\beta_1\sim N\left(\beta_0+\beta_1x_0,\sigma^2\left(\frac{1}{n}+\frac{(x_0-\bar x)^2}{S_{xx}}\right)\right)
-\]
-
-并且在满足$Y_i$正态性的前提下，我们还有：（证明请见附录\ref{proof23}）
-\[
-	\frac{(\hat\beta_0+\hat\beta_1x_0)-(\beta_0+\beta_1x_0)}{S_e\sqrt{\frac{1}{n}+\frac{(x_0-\bar x)^2}{S_{xx}}}}\sim t_{n-2}
-\]
-
-
-我们在之前的学习中已经知道有关于置信区间的知识。对于类似于$\beta_0+\beta_1x_0$这样已知分布的随机变量，我们同样可以计算出这个随机变量在某个置信水平下覆盖的置信区间。它是
-\[
-\Hat{\beta}_0+\Hat{\beta}_1x_0\pm t_{\frac{\alpha}{2},n-2}S_e\sqrt{\frac{1}{n}+\frac{(x_0-\Bar{x})^2}{S_{xx}}}
-\]
-
-其中，$x_0$是回归曲线上的某个值，$S_e$是残差的标准差。$t_{\frac{\alpha}{2},n-2}$是自由度为$n-2$的T分布上的分位数。
-
-这个区间叫做是$\beta_0+\beta_1x_0$的\textbf{置信区间}(Confidence Interval, CI)。现在我们要计算$Y_0$的\textbf{预测区间}(Prediction Interval, PI)的话，公式有一些小小的变动：
-\[
-\Hat{\beta}_0+\Hat{\beta}_1x_0\pm t_{\frac{\alpha}{2},n-2}S_e\sqrt{1+\frac{1}{n}+\frac{(x_0-\Bar{x})^2}{S_{xx}}}
-\]
-
-注意到预测区间和置信区间有本质上的不同，类似于$\beta_0+\beta_1x_0$和$Y_0$之间也有本质的不同一样。这里的置信区间是基于\textbf{估计}的方差而得出的，但是预测区间是根据\textbf{预测}的方差得出的。二者很大程度上是不同的，具体证明可见附录\ref{proof24}。
-\subsection{多元线性回归模型(Multiple Linear Regression, MLR)}
-和一元线性回归模型类似，只是MLR中是几个变量一同决定单个变量。这些变量之间还可能组成乘积等形式（即相互作用）。最简单的一个MLR是
-\[
-Y_i=\beta_0+\beta_1X_{i1}+\beta_1X_{i2}+\cdots+\beta_rX_{ir}+\varepsilon_i
-\]
-\subsection{矩阵表示}
-因为有多个观察数据，所以有多个拟合结果。由线性代数知识易知可以由矩阵表示多元线性方程组。
-
-例如，拥有$r$个变元的简单线性回归模型，可以用这样的矩阵表示：
-\[
-	\begin{pmatrix}
-		Y_1 \\
-		Y_2 \\
-		Y_3 \\
-		\vdots \\
-		Y_n
-	\end{pmatrix}
-	=
-	\begin{pmatrix}
-		1 & x_{11} & x_{12} & x_{13} & \cdots & x_{1r} \\
-		1 & x_{21} & x_{22} & x_{23} & \cdots & x_{2r} \\
-		1 & x_{31} & x_{32} & x_{33} & \cdots & x_{3r} \\
-		\vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
-		1 & x_{n1} & x_{n2} & x_{n3} & \cdots & x_{nr}
-	\end{pmatrix}
-	\times
-	\begin{pmatrix}
-		\beta_0 \\
-		\beta_1 \\
-		\beta_2 \\
-		\vdots \\
-		\beta_r
-	\end{pmatrix}
-	+
-	\begin{pmatrix}
-		\varepsilon_1 \\
-		\varepsilon_2 \\
-		\varepsilon_3 \\
-		\vdots \\
-		\varepsilon_n
-	\end{pmatrix}
-\]
-
-化简为
-\[
-	\boldsymbol{Y}=\boldsymbol{X\beta}+\boldsymbol{\varepsilon}
-\]
-
-\subsection{性质}
-$\boldsymbol{X}$中的列向量必须线性无关。若该性质不满足，则无法确定唯一的$\boldsymbol{\beta}$。该性质的证明请见附录\ref{proof27}。
-
-若矩阵$\boldsymbol{X}_{n\times p}$中的列向量线性无关，则$\boldsymbol{X}^T\boldsymbol{X}$矩阵可逆。证明请见附录\ref{proof28}。
-
-
-
-\subsection{最小二乘法}
-和之前的定义类似。我们希望找到$r+1$个值$\beta_0,\beta_1,\beta_2,\dots,\beta_r$使得这个函数最小：
-\[
-Q(\beta_0,\beta_1,\beta_2,\dots.\beta_r)=\sum_{i=1}^n(y_i-(\beta_0+\beta_1x_{i1}+\beta_2x_{i2}+\cdots+\beta_rx_{ir}\varepsilon_i))^2
-\]
-
-并且我们能计算，$\boldsymbol{\hat\beta}=(\boldsymbol{X}^T\boldsymbol{X})^{-1}\boldsymbol{X}^T\boldsymbol{y}$，证明请见附录\ref{proof29}。
-
-残差的方差是：
-\[
-S_e^2=\frac{1}{n-r-1}\sum_{i=1}^n(y_i-(\beta_0+\beta_1x_{i1}+\beta_2x_{i2}+\cdots+\beta_rx_{ir}\varepsilon_i))^2
-\]
-
-而矩阵形式计算的方差是：（证明请见附录\ref{proof30}）
-\[
-	S_e^2=\frac{1}{n-r-1}\lVert\boldsymbol{Y}-\boldsymbol{X\hat\beta}\rVert^2
-\]
-\subsection{判断系数的存在性}
-有的时候部分系数很接近零，我们可以简单地抛弃这些系数不要。怎么决定系数的去留呢？我们之前介绍了和$\beta_i$有关的假设检验，我们把对应的$\beta_i$值直接和零做假设检验，如果概率不小于显著性水平，我们就认为这个对应的$\beta_i$等于零，简化我们的模型。
-\section{评估、诊断模型并对其进行改进}
-\subsection{残差分析}
+\chapter{评估、诊断模型并对其进行改进}
+\section{残差分析}
 \noindent 1.残差的期望值应该是零（线性）。即残差在图中应该大致均匀分布在零周围\\
 2.对于所有残差，从第一个残差往后取任意个残差，这些残差组中的方差应该随机分布在零周围（齐性）。即残差组的方差不随其容量的扩大而存在显著趋势。\\
 3.残差应该满足标准正态分布（正态性）。这一般通过QQ图来判断。\\
 以上任意一个诊断标准不通过，都不能认为从这个模型中已经发掘出了足够的信息（即残差中还隐藏了部分信息）。
-\subsection{相关性系数}
+\section{相关性系数}
 定义一个相关性系数$r^2$:
 \[
 r^2=\frac{\sum_{i=1^n}(y_i-\Bar{y})^2-\sum_{i=1}^n(y_i-(\beta_0+\beta_1x_i))^2}{\sum_{i=1^n}(y_i-\Bar{y})^2}
@@ -398,19 +453,19 @@ r^2=\frac{\sum_{i=1^n}(y_i-\Bar{y})^2-\sum_{i=1}^n(y_i-(\beta_0+\beta_1x_i))^2}{
 r^2_R=1-\frac{n-1}{n-p-1}(1-r^2)
 \]
 其中，$p$是变量个数。
-\subsection{模型改进}
+\section{模型改进}
 如果以上诊断标准不通过怎么办？我们希望对模型进行改进以更好地符合上述诊断标准。\\
 \indent 比如说，有的时候两个变量并不是线性关系，我们可以把原先的$x$替换成$\ln{x}$或者是$e^x$（对数、指数等都可以进行尝试，但记得要变形回去），然后再试。
-\section{方差分析(ANOVA)}
+\chapter{方差分析(ANOVA)}
 主要用来判断施加了不同影响的组之间的均值是否有明显差异。
-\subsection{单因素方差分析}
+\section{单因素方差分析}
 现有一些羊被随机分为5组，其中一组为控制组，喂食普通的饲料，另外4组分别喂食ABCD四种新型饲料。过了一段时间后分别测量每组每只羊体重增长的大小，得到数据。现在想知道，新型饲料和普通饲料对于羊体重增长的效果究竟有没有区别？\\
 \indent 零假设是$H_0: \mu_0=\mu_1=\mu_2=\mu_3=\mu_4$，备择假设是它们的增长量并不全部相等。
-\subsubsection{前提条件}
+\subsection{前提条件}
 为了进行单因素方差分析，我们必须要提前假设这些：\\
 1.这些组之间的数据互相独立，并且每组中的数据都大致符合正态分布（回忆QQ图）。\\
 2.这些组中最大和最小的方差之间不能相差超过一倍。\\
-\subsubsection{如何进行F检验}
+\subsection{如何进行F检验}
 先看这个表格：
 \begin{center}
     \begin{tabular}{|c|c|c|c|c|}
@@ -423,7 +478,7 @@ r^2_R=1-\frac{n-1}{n-p-1}(1-r^2)
 \end{center}
 并且我们知道F检验量符合F分布$F(k-1,n-k)$。这是一个有两个自由度的分布，第一个是DFB，第二个是DFW，\textbf{顺序不准颠倒}。\\
 根据检验统计量符合的这个分布，我们进行通常的假设检验，计算p-value，决定是否推翻原假设。
-\subsubsection{最小显著性差异法}
+\subsection{最小显著性差异法}
 如果原假设被拒绝，那么我们就知道并不是所有组中的均值都相等。但是如果我们只想知道某两组之间的均值是否有显著差异呢？比如我们想知道AB两种饲料喂养的结果有没有显著差异，这时应该用什么办法呢？这时我们用最小显著性差异法，检验统计量叫做LSD，算法如下：
 \[
 LSD=t_{\frac{\alpha}{2}}(n-k)\sqrt{MSE\left(\frac{1}{n_i}+\frac{1}{n_j}\right)}
@@ -440,10 +495,34 @@ LSD=t_{\frac{\alpha}{2r}}(n-k)\sqrt{MSE\left(\frac{1}{n_i}+\frac{1}{n_j}\right)}
 
 
 
-\section{附录 Appendix}
-\subsection{证明}
-\subsubsection{唯一最小值的取得}
-\label{proof13}
+\chapter{附录 Appendix}
+\section{证明}
+\subsection{随机向量方差的性质}
+\label{proof:vector-var-prop}
+容易证明常数项$\Vector{b}$不影响方差。设$A_{ij}$是矩阵$\boldsymbol{A}$第$i$行第$j$列的元素，接下来证明$\mathrm{Var}(\boldsymbol{A}\Vector{X})=\boldsymbol{A}\boldsymbol{\Sigma}\boldsymbol{A}^T$：
+\begin{align*}
+	\mathrm{Var}(\boldsymbol{A}\Vector{X})&=\mathrm{Var}\left[\left(\sum_{i=1}^nA_{1i}X_i, \sum_{i=1}^nA_{2i}X_i,\sum_{i=1}^nA_{2i}X_i, \dots, \sum_{i=1}^nA_{mi}X_i\right)\right] \\
+	&=\begin{pmatrix}
+		\mathrm{Cov}(\sum_{i=1}^nA_{1i}X_i, \sum_{i=1}^nA_{1i}X_i) & \mathrm{Cov}(\sum_{i=1}^nA_{1i}X_i, \sum_{i=1}^nA_{2i}X_i) & \cdots & \mathrm{Cov}(\sum_{i=1}^nA_{1i}X_i, \sum_{i=1}^nA_{mi}X_i) \\
+		\mathrm{Cov}(\sum_{i=1}^nA_{2i}X_i, \sum_{i=1}^nA_{1i}X_i) & \mathrm{Cov}(\sum_{i=1}^nA_{2i}X_i, \sum_{i=1}^nA_{2i}X_i) & \cdots & \mathrm{Cov}(\sum_{i=1}^nA_{2i}X_i, \sum_{i=1}^nA_{mi}X_i) \\
+		\mathrm{Cov}(\sum_{i=1}^nA_{3i}X_i, \sum_{i=1}^nA_{1i}X_i) & \mathrm{Cov}(\sum_{i=1}^nA_{3i}X_i, \sum_{i=1}^nA_{2i}X_i) & \cdots & \mathrm{Cov}(\sum_{i=1}^nA_{3i}X_i, \sum_{i=1}^nA_{mi}X_i) \\
+		\vdots & \vdots & \ddots & \vdots \\
+		\mathrm{Cov}(\sum_{i=1}^nA_{mi}X_i, \sum_{i=1}^nA_{1i}X_i) & \mathrm{Cov}(\sum_{i=1}^nA_{mi}X_i, \sum_{i=1}^nA_{2i}X_i) & \cdots & \mathrm{Cov}(\sum_{i=1}^nA_{mi}X_i, \sum_{i=1}^nA_{mi}X_i)
+	\end{pmatrix} \\
+	&=\begin{pmatrix}
+		\sum_{i=1}^n\sum_{j=1}^nA_{1i}A_{1j}\mathrm{Cov}(X_i, X_j) & \sum_{i=1}^n\sum_{j=1}^nA_{1i}A_{2j}\mathrm{Cov}(X_i, X_j) & \cdots & \sum_{i=1}^n\sum_{j=1}^nA_{1i}A_{mj}\mathrm{Cov}(X_i, X_j) \\
+		\sum_{i=1}^n\sum_{j=1}^nA_{2i}A_{1j}\mathrm{Cov}(X_i, X_j) & \sum_{i=1}^n\sum_{j=1}^nA_{2i}A_{2j}\mathrm{Cov}(X_i, X_j) & \cdots & \sum_{i=1}^n\sum_{j=1}^nA_{2i}A_{mj}\mathrm{Cov}(X_i, X_j) \\
+		\sum_{i=1}^n\sum_{j=1}^nA_{3i}A_{1j}\mathrm{Cov}(X_i, X_j) & \sum_{i=1}^n\sum_{j=1}^nA_{3i}A_{2j}\mathrm{Cov}(X_i, X_j) & \cdots & \sum_{i=1}^n\sum_{j=1}^nA_{3i}A_{mj}\mathrm{Cov}(X_i, X_j) \\
+		\vdots & \vdots & \ddots & \vdots \\
+		\sum_{i=1}^n\sum_{j=1}^nA_{mi}A_{1j}\mathrm{Cov}(X_i, X_j) & \sum_{i=1}^n\sum_{j=1}^nA_{mi}A_{2j}\mathrm{Cov}(X_i, X_j) & \cdots & \sum_{i=1}^n\sum_{j=1}^nA_{mi}A_{mj}\mathrm{Cov}(X_i, X_j)
+	\end{pmatrix} \\
+	&=\boldsymbol{A}\boldsymbol{\Sigma}\boldsymbol{A}^T
+\end{align*}
+
+证毕。
+
+\subsection{唯一最小值的取得}
+\label{proof:LSE-lemma-minvalue-avg}
 通过公式可以获知：
 \begin{align*}
 	q(\nu)&=\sum_{i=1}^n(u_i-\nu)\\
@@ -462,33 +541,40 @@ LSD=t_{\frac{\alpha}{2r}}(n-k)\sqrt{MSE\left(\frac{1}{n_i}+\frac{1}{n_j}\right)}
 \end{align*}
 
 所以函数在$\nu=\bar u$时取得最小值，证毕。
-
-\subsubsection{最小二乘法参数的计算}
-\label{proof14}
-根据最小二乘法的定义（\ref{LSE definition}），我们知道：
+\subsection{线性回归系数矩阵的计算}
+\label{proof:LSE-matrix-calc}
+我们的目的是令$\Vert\boldsymbol{Y}-\boldsymbol{X\beta}\Vert^2$取到最小值。将它展开，得到：
 \begin{align*}
-	Q(\beta_0,\beta_1)&=\sum_{i=1}^n(y_i-(\beta_0+\beta_1x_i))^2\\
-	&=\sum_{i=1}^n((y_i-\beta_1x_i)-\beta_0)^2\\
+	\Vert\boldsymbol{Y}-\boldsymbol{X\beta}\Vert^2&=(\boldsymbol{Y}-\boldsymbol{X\beta})^T(\boldsymbol{Y}-\boldsymbol{X\beta}) \\
+	&=(\boldsymbol{Y}^T-\boldsymbol{\beta}^T\boldsymbol{X}^T)(\boldsymbol{Y}-\boldsymbol{X\beta}) \\
+	&=\boldsymbol{Y}^T\boldsymbol{Y}-\boldsymbol{Y}^T\boldsymbol{X\beta}-\boldsymbol{\beta}^T\boldsymbol{X}^T\boldsymbol{Y}+\boldsymbol{\beta}^T\boldsymbol{X}^T\boldsymbol{X\beta}\qquad \text{（注意到这里每一项都是方阵）} \\
+	&=\boldsymbol{Y}^T\boldsymbol{Y}-2\boldsymbol{Y}^T\boldsymbol{X\beta}+\boldsymbol{\beta}^T\boldsymbol{X}^T\boldsymbol{X\beta}
 \end{align*}
 
-所以根据上面的证明（\ref{proof13}），要使得$Q$最小，有$\hat\beta_0=\overline{(y_i-\beta_1x_i)}=\bar y-\beta_1\bar x$，得到$\hat\beta_0$的计算公式。接下来将得到的最优$\hat\beta_0$代入公式中，得到：
+接下来对$\boldsymbol{X}$进行特殊的QR分解，即令$\boldsymbol{X}=\boldsymbol{QR}$，其中$\boldsymbol{Q}$是尺寸为$n\times(p+1)$满足$\boldsymbol{Q}^T\boldsymbol{Q}=\boldsymbol{I}$的矩阵，$\boldsymbol{R}$是$(p+1)\times(p+1)$的上三角阵。完成此操作要求$\boldsymbol{X}$的列向量满秩。将分解后的矩阵代入上式，得到：
+\[
+	\Vert\boldsymbol{Y}-\boldsymbol{X\beta}\Vert^2=\boldsymbol{Y}^T\boldsymbol{Y}-2\boldsymbol{Y}^T\boldsymbol{QR\beta}+\boldsymbol{\beta}^T\boldsymbol{R}^T\boldsymbol{Q}^T\boldsymbol{QR\beta}
+\]
+
+在这个式子的右边同时加上和减去$\boldsymbol{Y}^T\boldsymbol{QQ}^T\boldsymbol{Y}$，使我们可以将右侧写成两项之和，其中只有一项包含$\boldsymbol{\beta}$：
 \begin{align*}
-	Q(\hat\beta_0,\beta_1)&=\sum_{i=1}^n(y_i-(\hat\beta_0+\beta_1x_i))^2\\
-	&=\sum_{i=1}^n[y_i-(\bar y-\beta_1\bar x+\beta_1x_i)]^2\\
-	&=\sum_{i=1}^n[(y_i-\bar y)-(x_i-\bar x)\beta_1]^2\\
+	\Vert\boldsymbol{Y}-\boldsymbol{X\beta}\Vert^2&=\boldsymbol{Y}^T\boldsymbol{Y}-\boldsymbol{Y}^T\boldsymbol{QQ}^T\boldsymbol{Y}+(\boldsymbol{Y}^T\boldsymbol{QQ}^T\boldsymbol{Y}-2\boldsymbol{Y}^T\boldsymbol{QR\beta}+\boldsymbol{\beta}^T\boldsymbol{R}^T\boldsymbol{Q}^T\boldsymbol{QR\beta}) \\
+	&=\boldsymbol{Y}^T(\boldsymbol{I}-\boldsymbol{QQ}^T)\boldsymbol{Y}+(\boldsymbol{Q}^T\boldsymbol{Y}-\boldsymbol{R\beta})^T(\boldsymbol{Q}^T\boldsymbol{Y}-\boldsymbol{R\beta})
 \end{align*}
 
-然后我们证明对一列实数$\{u_i\}$和$\{a_i\}$，函数$q(\nu)=\sum_{i=1}^n(u_i-a_i\nu)^2$，它取得最小值当且仅当$\nu=\frac{\sum_{i=1}^na_iu_i}{\sum_{i=1}^na_i^2}$：
+要令上式取到最小值，需要使$\boldsymbol{Q}^T\boldsymbol{Y}-\boldsymbol{R\beta}=0$，即$\boldsymbol{Q}^T\boldsymbol{Y}=\boldsymbol{R\beta}$. 因为$\boldsymbol{X}$的列满秩，所以$\boldsymbol{R}$一定可逆，得到$\boldsymbol{\hat\beta}=\boldsymbol{R}^{-1}\boldsymbol{Q}^T\boldsymbol{Y}$.
+
+然后我们证明这个结论和所证明的结论等价：
 \begin{align*}
-	q(\nu)&=\sum_{i=1}^n(u_i-a_i\nu)^2\\
-	&=\sum_{i=1}^n(u_i^2-2u_ia_i\nu+a_i^2\nu^2)\\
-	&=\sum_{i=1}^nu_i^2-2\nu\sum_{i=1}^na_iu_i+\nu^2\sum_{i=1}^na_i^2\\
-	&=\left(\sum_{i=1}^na_i^2\right)\nu^2-\left(2\sum_{i=1}^na_iu_i\right)+\sum_{i=1}^nu_i^2
+	\boldsymbol{X}^T&=\boldsymbol{R}^{T}\boldsymbol{Q}^T \\
+	\boldsymbol{X}^T\boldsymbol{X}&=\boldsymbol{R}^{T}\boldsymbol{Q}^T\boldsymbol{QR}=\boldsymbol{R}^T\boldsymbol{R} \\
+	(\boldsymbol{X}^T\boldsymbol{X})^{-1}&=\boldsymbol{R}^{-1}(\boldsymbol{R}^T)^{-1} \\
+	(\boldsymbol{X}^T\boldsymbol{X})^{-1}\boldsymbol{X}^T&=\boldsymbol{R}^{-1}(\boldsymbol{R}^T)^{-1}\boldsymbol{R}^T\boldsymbol{Q}^T=\boldsymbol{R}^{-1}\boldsymbol{Q}^T
 \end{align*}
 
-易知它是开口向上的抛物线，最小值仅在对称轴处取得，此抛物线的对称轴$-\frac{b}{2a}=-\frac{-2\sum_{i=1}^na_iu_i}{2\sum_{i=1}^na_i^2}=\frac{\sum_{i=1}^na_iu_i}{\sum_{i=1}^na_i^2}$。将这个结论用于得到的$Q(\hat\beta_0,\beta_1)$结果，我们能知道只有当$\beta_1=\frac{\sum_{i=1}^n(x_i-\bar x)(y_i-\bar y)}{\sum_{i=1}^n(x_i-\bar x)^2}$时，$Q(\hat\beta_0,\beta_1)$能取得最小值，所以$\hat\beta_1=\frac{S_{xy}}{S_{xx}}$，证毕。
+所以$\boldsymbol{\hat\beta}=\boldsymbol{R}^{-1}\boldsymbol{Q}^T\boldsymbol{Y}=(\boldsymbol{X}^T\boldsymbol{X})^{-1}\boldsymbol{X}^T\boldsymbol{Y}$，证毕。
 
-\subsubsection{残差方差的估计}
+\subsection{残差方差的估计}
 \label{proof15}
 （此处证明并不完全）
 
@@ -497,7 +583,7 @@ LSD=t_{\frac{\alpha}{2r}}(n-k)\sqrt{MSE\left(\frac{1}{n_i}+\frac{1}{n_j}\right)}
 但是在实际操作中，我们总是用$\hat\beta_0$和$\hat\beta_1$来估计真值，这就引入了两个“参数”。自由度的大小总是样本量减去参数个数，所以此处我们将分母替换成$n-2$，以解决此问题。
 %$\mathrm{Var}(\varepsilon_i)=\mathrm E[\varepsilon_i^2]-(\mathrm E[\varepsilon_i])^2=\mathrm E[\varepsilon_i^2]$
 
-\subsubsection{残差方差的另外一种计算方式}
+\subsection{残差方差的另外一种计算方式}
 \label{proof16}
 \begin{align*}
 	S_e^2&=\frac{1}{n-2}\sum_{i=1}^n(y_i-\hat y_i)^2\\
@@ -516,7 +602,7 @@ LSD=t_{\frac{\alpha}{2r}}(n-k)\sqrt{MSE\left(\frac{1}{n_i}+\frac{1}{n_j}\right)}
 
 证毕。
 
-\subsubsection{最小二乘法的模型系数分布证明}
+\subsection{最小二乘法的模型系数分布证明}
 \label{proof17}
 首先我们要对最小二乘法（\ref{LSE definition}）中要用到的几个参数进行变形操作，以便于后续证明。
 \begin{align*}
@@ -575,7 +661,7 @@ LSD=t_{\frac{\alpha}{2r}}(n-k)\sqrt{MSE\left(\frac{1}{n_i}+\frac{1}{n_j}\right)}
 	&=\sigma^2\left(\frac{1}{n}+\frac{\bar x^2}{S_{xx}}\right)
 \end{align*}
 
-\subsubsection{最小二乘法系数的协方差证明}
+\subsection{最小二乘法系数的协方差证明}
 \label{proof18}
 \begin{align*}
 	\mathrm{Cov}(\hat\beta_0,\hat\beta_1)&=\mathrm{Cov}(\sum_{i=1}^nb_iy_i,\sum_{j=1}^na_jy_j)\\
@@ -590,43 +676,43 @@ LSD=t_{\frac{\alpha}{2r}}(n-k)\sqrt{MSE\left(\frac{1}{n_i}+\frac{1}{n_j}\right)}
 	&=-\frac{\sigma\bar x^2}{S_{xx}}
 \end{align*}
 
-\subsubsection{最小二乘法系数分布的证明1}
+\subsection{最小二乘法系数分布的证明1}
 \label{proof19}
 （此证明暂时不要求掌握）
 
-\subsubsection{最小二乘法系数分布的证明2}
+\subsection{最小二乘法系数分布的证明2}
 \label{proof20}
 （此证明暂时不要求掌握）
 
-\subsubsection{预测值分布的证明1}
+\subsection{预测值分布的证明1}
 \label{proof21}
 
-\subsubsection{预测值分布的证明2}
+\subsection{预测值分布的证明2}
 \label{proof22}
 
-\subsubsection{预测值分布的证明3}
+\subsection{预测值分布的证明3}
 \label{proof23}
 
-\subsubsection{预测区间和置信区间的不同}
+\subsection{预测区间和置信区间的不同}
 \label{proof24}
 
-\subsubsection{残差满足的性质}
+\subsection{残差满足的性质}
 \label{proof25}
 
-\subsubsection{残差的标准化与学生化}
+\subsection{残差的标准化与学生化}
 \label{proof26}
 （此证明不要求掌握）
 
-\subsubsection{列向量必须线性无关}
+\subsection{列向量必须线性无关}
 \label{proof27}
 
-\subsubsection{列线性无关的矩阵性质1}
+\subsection{列线性无关的矩阵性质1}
 \label{proof28}
 
-\subsubsection{多元最小二乘法系数的计算}
+\subsection{多元最小二乘法系数的计算}
 \label{proof29}
 
-\subsubsection{多元最小二乘法残差的计算}
+\subsection{多元最小二乘法残差的计算}
 \label{proof30}
 
 
